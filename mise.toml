@@ -132,7 +132,7 @@ run = "npm start"
 [tasks.gen-source-docs]
 description = "Run source docs generator example"
 dir = "examples/gen-source-docs"
-run = "npm start"
+run = "npm run dev"
 
 [tasks.packages-build]
 description = "Build all vite-plugin packages"
