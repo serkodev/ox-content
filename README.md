@@ -33,16 +33,16 @@ Ox Content provides high-performance documentation tooling built on the Oxc phil
 
 ## Crates
 
-| Crate | Description |
-|-------|-------------|
-| [`ox_content_allocator`](./crates/ox_content_allocator) | Arena allocator wrapper around bumpalo |
-| [`ox_content_ast`](./crates/ox_content_ast) | Markdown AST definitions (mdast compatible) |
-| [`ox_content_parser`](./crates/ox_content_parser) | High-performance Markdown parser |
-| [`ox_content_renderer`](./crates/ox_content_renderer) | HTML and other format renderers |
-| [`ox_content_napi`](./crates/ox_content_napi) | Node.js bindings via napi-rs |
-| [`ox_content_vite`](./crates/ox_content_vite) | Vite Environment API integration |
-| [`ox_content_og_image`](./crates/ox_content_og_image) | OG image generation |
-| [`ox_content_docs`](./crates/ox_content_docs) | Source code documentation generator |
+| Crate                                                   | Description                                 |
+| ------------------------------------------------------- | ------------------------------------------- |
+| [`ox_content_allocator`](./crates/ox_content_allocator) | Arena allocator wrapper around bumpalo      |
+| [`ox_content_ast`](./crates/ox_content_ast)             | Markdown AST definitions (mdast compatible) |
+| [`ox_content_parser`](./crates/ox_content_parser)       | High-performance Markdown parser            |
+| [`ox_content_renderer`](./crates/ox_content_renderer)   | HTML and other format renderers             |
+| [`ox_content_napi`](./crates/ox_content_napi)           | Node.js bindings via napi-rs                |
+| [`ox_content_vite`](./crates/ox_content_vite)           | Vite Environment API integration            |
+| [`ox_content_og_image`](./crates/ox_content_og_image)   | OG image generation                         |
+| [`ox_content_docs`](./crates/ox_content_docs)           | Source code documentation generator         |
 
 ## Installation
 
@@ -127,10 +127,10 @@ use ox_content_parser::{Parser, ParserOptions};
 
 let allocator = Allocator::new();
 let source = r#"
-| Feature | Status |
-|---------|--------|
-| Tables  | ✅     |
-| Task Lists | ✅  |
+| Feature    | Status |
+| ---------- | ------ |
+| Tables     | ✅      |
+| Task Lists | ✅      |
 
 - [x] Completed task
 - [ ] Pending task
@@ -169,13 +169,13 @@ console.log(result.html);
 
 Try Ox Content with various frameworks and tools:
 
-| Example | Description | Command |
-|---------|-------------|---------|
-| Basic Playground | Interactive playground | `mise run example-playground` |
-| Vue 3 | Vue integration | `mise run example-vue` |
-| React 18 | React integration | `mise run example-react` |
-| Svelte 5 | Svelte integration | `mise run example-svelte` |
-| Vite SSG | Static site generation | `mise run example-ssg` |
+| Example          | Description            | Command                 |
+| ---------------- | ---------------------- | ----------------------- |
+| Basic Playground | Interactive playground | `mise run playground`   |
+| Vue 3            | Vue integration        | `mise run integ-vue`    |
+| React 18         | React integration      | `mise run integ-react`  |
+| Svelte 5         | Svelte integration     | `mise run integ-svelte` |
+| Vite SSG         | Static site generation | `mise run ssg-vite`     |
 
 See the [examples directory](./examples) for more integrations including markdown-it, rehype, and source code documentation.
 
@@ -200,11 +200,12 @@ mise run lint           # Run all lints
 mise run ready          # Run all checks (fmt, clippy, test)
 
 # Examples
-mise run example-playground  # Basic playground
-mise run example-vue         # Vue integration
-mise run example-react       # React integration
-mise run example-svelte      # Svelte integration
-mise run example-ssg         # Vite SSG
+mise run install        # Install pnpm dependencies for examples
+mise run playground     # Basic playground
+mise run integ-vue      # Vue integration
+mise run integ-react    # React integration
+mise run integ-svelte   # Svelte integration
+mise run ssg-vite       # Vite SSG
 ```
 
 ### Project Structure
