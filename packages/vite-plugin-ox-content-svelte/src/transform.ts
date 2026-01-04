@@ -1,4 +1,4 @@
-import type { ResolvedSvelteOptions, SvelteTransformResult, ComponentSlot } from './types';
+import type { ResolvedSvelteOptions, SvelteTransformResult, ComponentSlot, ComponentsMap } from './types';
 
 const COMPONENT_REGEX = /<([A-Z][a-zA-Z0-9]*)\s*([^>]*?)\s*\/?>(?:<\/\1>)?/g;
 const PROP_REGEX = /([a-zA-Z0-9-]+)(?:=(?:"([^"]*)"|'([^']*)'|{([^}]*)}))?/g;
@@ -6,9 +6,9 @@ const PROP_REGEX = /([a-zA-Z0-9-]+)(?:=(?:"([^"]*)"|'([^']*)'|{([^}]*)}))?/g;
 export async function transformMarkdownWithSvelte(
   code: string,
   id: string,
-  options: ResolvedSvelteOptions & { components: Map<string, string> }
+  options: ResolvedSvelteOptions
 ): Promise<SvelteTransformResult> {
-  const { components } = options;
+  const components: ComponentsMap = options.components;
   const usedComponents: string[] = [];
   const slots: ComponentSlot[] = [];
   let slotIndex = 0;
@@ -21,7 +21,7 @@ export async function transformMarkdownWithSvelte(
   while ((match = COMPONENT_REGEX.exec(markdownContent)) !== null) {
     const [fullMatch, componentName, propsString] = match;
 
-    if (components.has(componentName)) {
+    if (componentName in components) {
       if (!usedComponents.includes(componentName)) {
         usedComponents.push(componentName);
       }
@@ -116,10 +116,10 @@ function generateSvelteModule(
   usedComponents: string[],
   slots: ComponentSlot[],
   frontmatter: Record<string, unknown>,
-  options: ResolvedSvelteOptions & { components: Map<string, string> }
+  options: ResolvedSvelteOptions
 ): string {
   const imports = usedComponents
-    .map((name) => `import ${name} from '${options.components.get(name)}';`)
+    .map((name) => `import ${name} from '${options.components[name]}';`)
     .join('\n');
 
   const componentRendering = slots

@@ -6,8 +6,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Plugin, PluginOption, Environment, ResolvedConfig } from 'vite';
-import { oxContent, type OxContentOptions } from 'vite-plugin-ox-content';
+import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
+import { oxContent } from 'vite-plugin-ox-content';
 import { transformMarkdownWithSvelte } from './transform';
 import { createSvelteMarkdownEnvironment } from './environment';
 import type { SvelteIntegrationOptions, ResolvedSvelteOptions, ComponentsMap, ComponentsOption } from './types';
@@ -76,8 +76,8 @@ export function oxContentSvelte(options: SvelteIntegrationOptions = {}): PluginO
       }
 
       const result = await transformMarkdownWithSvelte(code, id, {
-        components: componentMap,
         ...resolved,
+        components: Object.fromEntries(componentMap),
       });
 
       return {
@@ -93,8 +93,8 @@ export function oxContentSvelte(options: SvelteIntegrationOptions = {}): PluginO
     config() {
       return {
         environments: {
-          'ox-content-ssr': createSvelteMarkdownEnvironment('ssr', resolved),
-          'ox-content-client': createSvelteMarkdownEnvironment('client', resolved),
+          oxcontent_ssr: createSvelteMarkdownEnvironment('ssr', resolved),
+          oxcontent_client: createSvelteMarkdownEnvironment('client', resolved),
         },
       };
     },
@@ -119,8 +119,8 @@ export function oxContentSvelte(options: SvelteIntegrationOptions = {}): PluginO
       return null;
     },
 
-    applyToEnvironment(environment: Environment) {
-      return ['ox-content-ssr', 'ox-content-client', 'client', 'ssr'].includes(
+    applyToEnvironment(environment) {
+      return ['oxcontent_ssr', 'oxcontent_client', 'client', 'ssr'].includes(
         environment.name
       );
     },

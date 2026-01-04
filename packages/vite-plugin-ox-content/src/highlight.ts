@@ -76,7 +76,7 @@ function rehypeShikiHighlight(options: { theme: string }) {
 
               if (Array.isArray(className)) {
                 const langClass = className.find(
-                  (c) => typeof c === 'string' && c.startsWith('language-')
+                  (c: string | number) => typeof c === 'string' && c.startsWith('language-')
                 );
                 if (langClass && typeof langClass === 'string') {
                   lang = langClass.replace('language-', '');

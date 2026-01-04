@@ -54,7 +54,7 @@ function rehypeMermaid() {
 
               if (Array.isArray(className)) {
                 isMermaid = className.some(
-                  (c) => typeof c === 'string' && c.includes('mermaid')
+                  (c: string | number) => typeof c === 'string' && c.includes('mermaid')
                 );
               }
 

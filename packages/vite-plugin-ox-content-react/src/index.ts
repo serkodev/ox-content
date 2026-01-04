@@ -6,8 +6,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Plugin, PluginOption, Environment, ResolvedConfig } from 'vite';
-import { oxContent, type OxContentOptions } from 'vite-plugin-ox-content';
+import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
+import { oxContent } from 'vite-plugin-ox-content';
 import { transformMarkdownWithReact } from './transform';
 import { createReactMarkdownEnvironment } from './environment';
 import type { ReactIntegrationOptions, ResolvedReactOptions, ComponentsMap, ComponentsOption } from './types';
@@ -76,8 +76,8 @@ export function oxContentReact(options: ReactIntegrationOptions = {}): PluginOpt
       }
 
       const result = await transformMarkdownWithReact(code, id, {
-        components: componentMap,
         ...resolved,
+        components: Object.fromEntries(componentMap),
       });
 
       return {
@@ -91,10 +91,14 @@ export function oxContentReact(options: ReactIntegrationOptions = {}): PluginOpt
     name: 'ox-content:react-environment',
 
     config() {
+      const envOptions = {
+        ...resolved,
+        components: Object.fromEntries(componentMap),
+      };
       return {
         environments: {
-          'ox-content-ssr': createReactMarkdownEnvironment('ssr', resolved),
-          'ox-content-client': createReactMarkdownEnvironment('client', resolved),
+          oxcontent_ssr: createReactMarkdownEnvironment('ssr', envOptions),
+          oxcontent_client: createReactMarkdownEnvironment('client', envOptions),
         },
       };
     },
@@ -119,8 +123,8 @@ export function oxContentReact(options: ReactIntegrationOptions = {}): PluginOpt
       return null;
     },
 
-    applyToEnvironment(environment: Environment) {
-      return ['ox-content-ssr', 'ox-content-client', 'client', 'ssr'].includes(
+    applyToEnvironment(environment) {
+      return ['oxcontent_ssr', 'oxcontent_client', 'client', 'ssr'].includes(
         environment.name
       );
     },
@@ -165,7 +169,7 @@ export function oxContentReact(options: ReactIntegrationOptions = {}): PluginOpt
   ];
 }
 
-function resolveReactOptions(options: ReactIntegrationOptions): ResolvedReactOptions {
+function resolveReactOptions(options: ReactIntegrationOptions): Omit<ResolvedReactOptions, 'components'> {
   return {
     srcDir: options.srcDir ?? 'docs',
     outDir: options.outDir ?? 'dist',
@@ -174,7 +178,6 @@ function resolveReactOptions(options: ReactIntegrationOptions): ResolvedReactOpt
     frontmatter: options.frontmatter ?? true,
     toc: options.toc ?? true,
     tocMaxDepth: options.tocMaxDepth ?? 3,
-    components: options.components ?? {},
     jsxRuntime: options.jsxRuntime ?? 'automatic',
   };
 }

@@ -7,7 +7,7 @@
 
 import type { ResolvedOptions, TransformResult, TocEntry } from './types';
 import { highlightCode } from './highlight';
-import { transformMermaid, mermaidClientScript, mermaidStyles } from './mermaid';
+import { transformMermaid } from './mermaid';
 
 // NAPI bindings interface
 interface NapiBindings {
