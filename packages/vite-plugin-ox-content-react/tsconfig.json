@@ -6,17 +6,15 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "jsx": "react-jsx",
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["node"]
+    "types": ["node"],
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../vite-plugin-ox-content" }
-  ]
+  "exclude": ["node_modules", "dist"]
 }

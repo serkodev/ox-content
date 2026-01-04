@@ -70,19 +70,13 @@ export function createMarkdownEnvironment(
       dedupe: [],
     },
 
-    // Development configuration
-    dev: {
-      // Optimize dependencies for the environment
-      optimizeDeps: {
-        // Include ox-content dependencies
-        include: [],
-        // Exclude native modules
-        exclude: ['@ox-content/napi'],
-      },
+    // Optimize dependencies
+    optimizeDeps: {
+      // Include ox-content dependencies
+      include: [],
+      // Exclude native modules
+      exclude: ['@ox-content/napi'],
     },
-
-    // Web worker configuration (if needed for parallel processing)
-    webCompatible: false,
   };
 }
 
@@ -136,7 +130,7 @@ export function createTransformOptions(
  */
 export async function prerender(
   files: string[],
-  options: ResolvedOptions
+  _options: ResolvedOptions
 ): Promise<Map<string, string>> {
   const results = new Map<string, string>();
 
@@ -154,7 +148,7 @@ export async function prerender(
  *
  * Creates plugins specific to the Markdown environment.
  */
-export function createEnvironmentPlugins(options: ResolvedOptions) {
+export function createEnvironmentPlugins(_options: ResolvedOptions) {
   return [
     {
       name: 'ox-content:markdown-env',

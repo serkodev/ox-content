@@ -7,8 +7,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Plugin, PluginOption, Environment, ResolvedConfig } from 'vite';
-import { oxContent, type OxContentOptions } from 'vite-plugin-ox-content';
+import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
+import { oxContent } from 'vite-plugin-ox-content';
 import { transformMarkdownWithVue } from './transform';
 import { createVueMarkdownEnvironment } from './environment';
 import type { VueIntegrationOptions, ResolvedVueOptions, ComponentsMap, ComponentsOption } from './types';
@@ -82,8 +82,8 @@ export function oxContentVue(options: VueIntegrationOptions = {}): PluginOption[
       }
 
       const result = await transformMarkdownWithVue(code, id, {
-        components: componentMap,
         ...resolved,
+        components: componentMap,
       });
 
       return {
@@ -101,9 +101,9 @@ export function oxContentVue(options: VueIntegrationOptions = {}): PluginOption[
       return {
         environments: {
           // SSR environment for Vue component rendering
-          'ox-content-ssr': createVueMarkdownEnvironment('ssr', resolved),
+          oxcontent_ssr: createVueMarkdownEnvironment('ssr', resolved),
           // Client environment for hydration
-          'ox-content-client': createVueMarkdownEnvironment('client', resolved),
+          oxcontent_client: createVueMarkdownEnvironment('client', resolved),
         },
       };
     },
@@ -111,7 +111,7 @@ export function oxContentVue(options: VueIntegrationOptions = {}): PluginOption[
     // Environment-specific module resolution
     resolveId: {
       order: 'pre',
-      async handler(id, importer, options) {
+      async handler(id, _importer, _options) {
         // Handle virtual modules for Vue markdown runtime
         if (id === 'virtual:ox-content-vue/runtime') {
           return '\0virtual:ox-content-vue/runtime';
@@ -141,10 +141,10 @@ export function oxContentVue(options: VueIntegrationOptions = {}): PluginOption[
     },
 
     // Per-environment build hooks
-    applyToEnvironment(environment: Environment) {
+    applyToEnvironment(environment) {
       return (
-        environment.name === 'ox-content-ssr' ||
-        environment.name === 'ox-content-client' ||
+        environment.name === 'oxcontent_ssr' ||
+        environment.name === 'oxcontent_client' ||
         environment.name === 'client' ||
         environment.name === 'ssr'
       );
@@ -216,7 +216,7 @@ function resolveVueOptions(options: VueIntegrationOptions): ResolvedVueOptions {
 /**
  * Generates the runtime module for Vue markdown rendering.
  */
-function generateRuntimeModule(options: ResolvedVueOptions): string {
+function generateRuntimeModule(_options: ResolvedVueOptions): string {
   return `
 import { h, defineComponent, ref, onMounted } from 'vue';
 

@@ -72,7 +72,7 @@ export function createVueMarkdownEnvironment(
  */
 export function createVirtualModules(
   mode: 'ssr' | 'client',
-  options: ResolvedVueOptions
+  _options: ResolvedVueOptions
 ): Record<string, string> {
   const isSSR = mode === 'ssr';
 

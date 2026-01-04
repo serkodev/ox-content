@@ -44,7 +44,7 @@ export type {
 export function oxContent(options: OxContentOptions = {}): Plugin[] {
   const resolvedOptions = resolveOptions(options);
   let config: ResolvedConfig;
-  let server: ViteDevServer | undefined;
+  let _server: ViteDevServer | undefined;
 
   const mainPlugin: Plugin = {
     name: 'ox-content',
@@ -54,7 +54,7 @@ export function oxContent(options: OxContentOptions = {}): Plugin[] {
     },
 
     configureServer(devServer) {
-      server = devServer;
+      _server = devServer;
 
       // Add middleware for serving Markdown files
       devServer.middlewares.use(async (req, res, next) => {
@@ -102,7 +102,7 @@ export function oxContent(options: OxContentOptions = {}): Plugin[] {
 
       return {
         code: result.code,
-        map: result.map,
+        map: null,
       };
     },
 

@@ -7,6 +7,36 @@
 
 import type { ResolvedOptions, TransformResult, TocEntry } from './types';
 
+// NAPI bindings interface
+interface NapiBindings {
+  parseAndRender: (source: string, options?: { gfm?: boolean }) => { html: string; errors: string[] };
+}
+
+// Cached NAPI bindings
+let napiBindings: NapiBindings | null | undefined;
+let napiLoadAttempted = false;
+
+/**
+ * Lazily load NAPI bindings.
+ */
+async function loadNapiBindings(): Promise<NapiBindings | null> {
+  if (napiLoadAttempted) {
+    return napiBindings ?? null;
+  }
+  napiLoadAttempted = true;
+
+  try {
+    // Dynamic import to handle cases where NAPI isn't built
+    const mod = await import('@ox-content/napi');
+    napiBindings = mod;
+    return mod;
+  } catch {
+    // NAPI not available, will use fallback
+    napiBindings = null;
+    return null;
+  }
+}
+
 /**
  * Transforms Markdown content into a JavaScript module.
  *
@@ -27,9 +57,8 @@ export async function transformMarkdown(
   // Generate table of contents
   const toc = options.toc ? generateToc(content, options.tocMaxDepth) : [];
 
-  // Render HTML
-  // In production, this would use @ox-content/napi
-  const html = renderToHtml(content, options);
+  // Render HTML using NAPI bindings (Rust parser) if available
+  const html = await renderToHtml(content, options);
 
   // Generate JavaScript module code
   const code = generateModuleCode(html, frontmatter, toc, filePath, options);
@@ -151,48 +180,115 @@ function slugify(text: string): string {
 /**
  * Renders Markdown content to HTML.
  *
- * In production, this uses @ox-content/napi for high-performance rendering.
- * This is a fallback implementation for development.
+ * Uses @ox-content/napi for high-performance Rust-based rendering.
+ * Falls back to a basic regex implementation if NAPI is not available.
  */
-function renderToHtml(content: string, options: ResolvedOptions): string {
-  // TODO: Replace with actual @ox-content/napi call
-  // import { parseAndRender } from '@ox-content/napi';
-  // const result = parseAndRender(content, {
-  //   gfm: options.gfm,
-  //   footnotes: options.footnotes,
-  //   tables: options.tables,
-  //   taskLists: options.taskLists,
-  //   strikethrough: options.strikethrough,
-  // });
-  // return result.html;
+async function renderToHtml(content: string, options: ResolvedOptions): Promise<string> {
+  // Load and use NAPI bindings if available (Rust-based parser)
+  const napi = await loadNapiBindings();
+  if (napi) {
+    const result = napi.parseAndRender(content, {
+      gfm: options.gfm,
+    });
+    if (result.errors.length > 0) {
+      console.warn('[ox-content] Parse warnings:', result.errors);
+    }
+    return result.html;
+  }
 
-  // Fallback: Simple Markdown rendering
-  let html = content
-    // Headers with IDs for linking
-    .replace(/^### (.+)$/gm, (_, text) => `<h3 id="${slugify(text)}">${text}</h3>`)
-    .replace(/^## (.+)$/gm, (_, text) => `<h2 id="${slugify(text)}">${text}</h2>`)
-    .replace(/^# (.+)$/gm, (_, text) => `<h1 id="${slugify(text)}">${text}</h1>`)
-    // Bold and italic
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Code blocks
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
-      const langClass = lang ? ` class="language-${lang}"` : '';
-      return `<pre><code${langClass}>${escapeHtml(code)}</code></pre>`;
-    })
-    // Inline code
-    .replace(/`(.+?)`/g, '<code>$1</code>')
-    // Task lists (GFM)
-    .replace(/^- \[x\] (.+)$/gm, '<li class="task-list-item"><input type="checkbox" checked disabled> $1</li>')
-    .replace(/^- \[ \] (.+)$/gm, '<li class="task-list-item"><input type="checkbox" disabled> $1</li>')
-    // Regular lists
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    // Paragraphs
-    .replace(/\n\n/g, '</p><p>')
-    // Line breaks
-    .replace(/\n/g, '<br>');
+  // Fallback: basic regex-based rendering (for development when NAPI not built)
+  console.warn('[ox-content] NAPI bindings not available, using fallback renderer');
+  let html = content;
+
+  // Code blocks first (to prevent interference with other patterns)
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const langClass = lang ? ` class="language-${lang}"` : '';
+    return `\n<pre><code${langClass}>${escapeHtml(code.trim())}</code></pre>\n`;
+  });
+
+  // Tables (GFM)
+  html = html.replace(/^\|(.+)\|\r?\n\|[-:| ]+\|\r?\n((?:\|.+\|\r?\n?)+)/gm, (_, header, body) => {
+    const headerCells = header.split('|').map((c: string) => c.trim()).filter(Boolean);
+    const headerRow = headerCells.map((c: string) => `<th>${c}</th>`).join('');
+
+    const bodyRows = body.trim().split('\n').map((row: string) => {
+      const cells = row.split('|').map((c: string) => c.trim()).filter(Boolean);
+      return `<tr>${cells.map((c: string) => `<td>${c}</td>`).join('')}</tr>`;
+    }).join('\n');
+
+    return `<table>\n<thead><tr>${headerRow}</tr></thead>\n<tbody>\n${bodyRows}\n</tbody>\n</table>\n`;
+  });
+
+  // Headers with IDs for linking (h4, h3, h2, h1 in order)
+  html = html.replace(/^#### (.+)$/gm, (_, text) => `<h4 id="${slugify(text)}">${text}</h4>`);
+  html = html.replace(/^### (.+)$/gm, (_, text) => `<h3 id="${slugify(text)}">${text}</h3>`);
+  html = html.replace(/^## (.+)$/gm, (_, text) => `<h2 id="${slugify(text)}">${text}</h2>`);
+  html = html.replace(/^# (.+)$/gm, (_, text) => `<h1 id="${slugify(text)}">${text}</h1>`);
+
+  // Horizontal rules
+  html = html.replace(/^(---|\*\*\*|___)\s*$/gm, '<hr>');
+
+  // Blockquotes
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  // Merge consecutive blockquotes
+  html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
+
+  // Bold and italic (order matters)
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  html = html.replace(/_([^_\n]+)_/g, '<em>$1</em>');
+
+  // Strikethrough (GFM)
+  html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  // Inline code (after code blocks to prevent interference)
+  html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+
+  // Links and images
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // Task lists (GFM)
+  html = html.replace(/^(\s*)- \[x\] (.+)$/gm, '$1<li class="task-list-item"><input type="checkbox" checked disabled> $2</li>');
+  html = html.replace(/^(\s*)- \[ \] (.+)$/gm, '$1<li class="task-list-item"><input type="checkbox" disabled> $2</li>');
+
+  // Unordered lists
+  html = html.replace(/^(\s*)- (.+)$/gm, '$1<li>$2</li>');
+
+  // Ordered lists
+  html = html.replace(/^(\s*)\d+\. (.+)$/gm, '$1<li>$2</li>');
+
+  // Wrap consecutive <li> elements in <ul> or <ol>
+  html = html.replace(/((?:<li[^>]*>.*<\/li>\n?)+)/g, (match) => {
+    // Check if it's a task list or regular list
+    if (match.includes('task-list-item')) {
+      return `<ul class="task-list">\n${match}</ul>\n`;
+    }
+    return `<ul>\n${match}</ul>\n`;
+  });
+
+  // Split into blocks and wrap paragraphs
+  const blocks = html.split(/\n\n+/);
+  html = blocks.map(block => {
+    block = block.trim();
+    if (!block) return '';
+    // Don't wrap if it's already a block element
+    if (/^<(h[1-6]|p|div|ul|ol|li|table|thead|tbody|tr|th|td|pre|blockquote|hr|img)[\s>]/i.test(block)) {
+      return block;
+    }
+    // Don't wrap if it ends with a block element
+    if (/<\/(h[1-6]|p|div|ul|ol|table|pre|blockquote)>$/i.test(block)) {
+      return block;
+    }
+    return `<p>${block}</p>`;
+  }).join('\n\n');
+
+  // Clean up extra line breaks within paragraphs
+  html = html.replace(/<p>([\s\S]*?)<\/p>/g, (_, content) => {
+    return `<p>${content.replace(/\n/g, '<br>')}</p>`;
+  });
 
   return `<div class="ox-content">${html}</div>`;
 }
@@ -217,7 +313,7 @@ function generateModuleCode(
   frontmatter: Record<string, unknown>,
   toc: TocEntry[],
   filePath: string,
-  options: ResolvedOptions
+  _options: ResolvedOptions
 ): string {
   const htmlJson = JSON.stringify(html);
   const frontmatterJson = JSON.stringify(frontmatter);

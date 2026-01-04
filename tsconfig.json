@@ -1,10 +1,12 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./packages/vite-plugin-ox-content" },
-    { "path": "./packages/vite-plugin-ox-content-vue" },
-    { "path": "./packages/vite-plugin-ox-content-react" },
-    { "path": "./packages/vite-plugin-ox-content-svelte" },
-    { "path": "./docs" }
-  ]
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": [],
+  "exclude": ["node_modules", "**/dist/**"]
 }

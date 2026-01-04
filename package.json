@@ -7,10 +7,11 @@
     "dev": "pnpm -r run dev",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "oxlint --type-check"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "oxlint": "catalog:",
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=22",

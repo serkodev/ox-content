@@ -134,6 +134,27 @@ description = "Run source docs generator example"
 dir = "examples/gen-source-docs"
 run = "npm start"
 
+[tasks.packages-build]
+description = "Build all vite-plugin packages"
+run = "pnpm -r --filter 'vite-plugin-ox-content' --filter 'vite-plugin-ox-content-vue' run build"
+
+[tasks.docs]
+description = "Start documentation dev server"
+depends = ["packages-build"]
+dir = "docs"
+run = "pnpm dev"
+
+[tasks.docs-build]
+description = "Build documentation site"
+depends = ["packages-build"]
+dir = "docs"
+run = "pnpm build"
+
+[tasks.docs-preview]
+description = "Preview documentation build"
+dir = "docs"
+run = "pnpm preview"
+
 [tasks.install]
 description = "Install all dependencies with pnpm"
 run = "pnpm install"

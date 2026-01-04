@@ -11,12 +11,19 @@ const COMPONENT_REGEX = /<([A-Z][a-zA-Z0-9]*)\s*([^>]*?)\s*\/?>(?:<\/\1>)?/g;
 const PROP_REGEX = /(?::|v-bind:)?([a-zA-Z0-9-]+)(?:=(?:"([^"]*)"|'([^']*)'|{([^}]*)}|\[([^\]]*)\]))?/g;
 
 /**
+ * Options for transformMarkdownWithVue.
+ */
+interface TransformOptions extends Omit<ResolvedVueOptions, 'components'> {
+  components: Map<string, string>;
+}
+
+/**
  * Transforms Markdown content with Vue component support.
  */
 export async function transformMarkdownWithVue(
   code: string,
   id: string,
-  options: ResolvedVueOptions & { components: Map<string, string> }
+  options: TransformOptions
 ): Promise<VueTransformResult> {
   const { components } = options;
   const usedComponents: string[] = [];
@@ -175,7 +182,7 @@ function generateVueSFC(
   slots: ComponentSlot[],
   frontmatter: Record<string, unknown>,
   options: ResolvedVueOptions & { components: Map<string, string> },
-  id: string
+  _id: string
 ): string {
   const componentImports = usedComponents
     .map((name) => {

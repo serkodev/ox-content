@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { oxContent } from 'vite-plugin-ox-content';
-import { oxContentVue } from 'vite-plugin-ox-content-vue';
 
 /**
  * Ox Content Documentation Site
  *
  * Dogfooding: Using ox-content to build ox-content's own documentation.
+ * Uses the base oxContent plugin which transforms .md to JavaScript modules.
  */
 export default defineConfig({
   // Site base path (for GitHub Pages)
@@ -36,13 +36,8 @@ export default defineConfig({
       ogImageOptions: {
         background: '#1a1a2e',
         textColor: '#ffffff',
-        accentColor: '#e94560',
+        accentColor: '#bd34fe',
       },
-    }),
-
-    oxContentVue({
-      srcDir: '.',
-      components: './src/components/*.vue',
     }),
   ],
 

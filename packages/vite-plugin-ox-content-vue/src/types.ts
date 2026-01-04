@@ -76,7 +76,7 @@ export interface ResolvedVueOptions {
   frontmatter: boolean;
   toc: boolean;
   tocMaxDepth: number;
-  components: ComponentsMap;
+  components: ComponentsOption;
   reactivityTransform: boolean;
   customBlocks: boolean;
 }

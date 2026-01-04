@@ -226,9 +226,9 @@ export interface TransformResult {
   code: string;
 
   /**
-   * Source map.
+   * Source map (null means no source map).
    */
-  map?: unknown;
+  map?: null;
 
   /**
    * Rendered HTML.
