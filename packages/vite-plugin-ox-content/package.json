@@ -22,16 +22,16 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "vite": "^6.0.0"
+    "vite": "catalog:"
   },
   "dependencies": {
     "@ox-content/napi": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "@types/node": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "keywords": [
     "vite",

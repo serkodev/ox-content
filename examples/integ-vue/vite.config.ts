@@ -7,12 +7,8 @@ export default defineConfig({
     vue(),
     oxContentVue({
       srcDir: 'docs',
-      components: {
-        // Register components to use in Markdown
-        Counter: './src/components/Counter.vue',
-        Alert: './src/components/Alert.vue',
-        CodeDemo: './src/components/CodeDemo.vue',
-      },
+      // Auto-discover components using glob pattern
+      components: './src/components/*.vue',
     }),
   ],
 });

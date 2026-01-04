@@ -97,20 +97,21 @@ SSG-focused rendering with Astro-like islands architecture:
 
 ```typescript
 // vite.config.ts
-import { oxContent } from '@ox-content/vite';
+import { defineConfig } from 'vite';
+import { oxContent } from 'vite-plugin-ox-content';
 
-export default {
+export default defineConfig({
   plugins: [
     oxContent({
-      // Markdown source directory
       srcDir: 'docs',
-      // Output directory
-      outDir: 'dist',
-      // Enable syntax highlighting
-      highlight: true,
+      // Auto-generate API docs from source
+      docs: {
+        src: ['./src'],
+        out: 'docs/api',
+      },
     })
   ]
-};
+});
 ```
 
 ### OG Image Generation
@@ -145,7 +146,9 @@ const { html, frontmatter } = parseAndRender(content, {
 });
 ```
 
-## Crates Overview
+## Packages
+
+### Rust Crates
 
 | Crate | Description | Key Features |
 |-------|-------------|--------------|
@@ -154,9 +157,16 @@ const { html, frontmatter } = parseAndRender(content, {
 | `ox_content_parser` | Markdown parser | CommonMark + GFM, streaming support |
 | `ox_content_renderer` | HTML renderer | Customizable, XHTML support, sanitization |
 | `ox_content_napi` | Node.js bindings | napi-rs, TypeScript types |
-| `ox_content_vite` | Vite plugin | Environment API, HMR support |
 | `ox_content_og_image` | OG images | SVG-based, customizable templates |
-| `ox_content_docs` | Source docs | OXC-powered, cargo docs-like |
+
+### Vite Plugins
+
+| Package | Description | Key Features |
+|---------|-------------|--------------|
+| [vite-plugin-ox-content](./packages/vite-plugin-ox-content.md) | Base Vite plugin | Environment API, HMR, Builtin docs generation |
+| [vite-plugin-ox-content-vue](./packages/vite-plugin-ox-content-vue.md) | Vue integration | Embed Vue components in Markdown |
+| [vite-plugin-ox-content-react](./packages/vite-plugin-ox-content-react.md) | React integration | Embed React components in Markdown |
+| [vite-plugin-ox-content-svelte](./packages/vite-plugin-ox-content-svelte.md) | Svelte integration | Embed Svelte 5 components in Markdown |
 
 ## Quick Links
 

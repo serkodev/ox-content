@@ -10,8 +10,8 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "vite": "^6.0.0",
+    "vite": "catalog:",
     "vite-plugin-ox-content": "workspace:*",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:"
   }
 }

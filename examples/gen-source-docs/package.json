@@ -1,15 +1,20 @@
 {
-  "name": "ox-content-source-docs-example",
+  "name": "ox-content-gen-source-docs-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "build": "node index.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "dependencies": {},
+  "dependencies": {
+    "vue": "catalog:"
+  },
   "devDependencies": {
-    "@ox-content/napi": "workspace:*"
+    "@vitejs/plugin-vue": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-ox-content": "workspace:*",
+    "vite-plugin-ox-content-vue": "workspace:*"
   }
 }

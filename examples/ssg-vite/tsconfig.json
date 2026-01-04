@@ -13,7 +13,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "vite-plugin-ox-content": ["../../packages/vite-plugin-ox-content/src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src/**/*.ts", "vite.config.ts"]
 }

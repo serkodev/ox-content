@@ -4,13 +4,22 @@
  * Uses Vite's Environment API to enable embedding Svelte components in Markdown.
  */
 
-import type { Plugin, PluginOption, Environment } from 'vite';
+import * as fs from 'fs';
+import * as path from 'path';
+import type { Plugin, PluginOption, Environment, ResolvedConfig } from 'vite';
 import { oxContent, type OxContentOptions } from 'vite-plugin-ox-content';
 import { transformMarkdownWithSvelte } from './transform';
 import { createSvelteMarkdownEnvironment } from './environment';
-import type { SvelteIntegrationOptions, ResolvedSvelteOptions } from './types';
+import type { SvelteIntegrationOptions, ResolvedSvelteOptions, ComponentsMap, ComponentsOption } from './types';
 
-export type { SvelteIntegrationOptions } from './types';
+export type {
+  SvelteIntegrationOptions,
+  ResolvedSvelteOptions,
+  ComponentsOption,
+  ComponentsMap,
+  SvelteTransformResult,
+  ComponentSlot,
+} from './types';
 
 /**
  * Creates the Ox Content Svelte integration plugin.
@@ -37,11 +46,29 @@ export type { SvelteIntegrationOptions } from './types';
  */
 export function oxContentSvelte(options: SvelteIntegrationOptions = {}): PluginOption[] {
   const resolved = resolveSvelteOptions(options);
-  const componentMap = new Map(Object.entries(resolved.components));
+  let componentMap = new Map<string, string>();
+  let config: ResolvedConfig;
+
+  if (typeof options.components === 'object' && !Array.isArray(options.components)) {
+    componentMap = new Map(Object.entries(options.components));
+  }
 
   const svelteTransformPlugin: Plugin = {
     name: 'ox-content:svelte-transform',
     enforce: 'pre',
+
+    async configResolved(resolvedConfig) {
+      config = resolvedConfig;
+
+      const componentsOption = options.components;
+      if (componentsOption) {
+        const resolvedComponents = await resolveComponentsGlob(
+          componentsOption,
+          config.root
+        );
+        componentMap = new Map(Object.entries(resolvedComponents));
+      }
+    },
 
     async transform(code, id) {
       if (!id.endsWith('.md')) {
@@ -177,6 +204,89 @@ ${exports.join('\n')}
 
 export default components;
 `;
+}
+
+async function resolveComponentsGlob(
+  componentsOption: ComponentsOption,
+  root: string
+): Promise<ComponentsMap> {
+  if (typeof componentsOption === 'object' && !Array.isArray(componentsOption)) {
+    return componentsOption;
+  }
+
+  const patterns = Array.isArray(componentsOption)
+    ? componentsOption
+    : [componentsOption];
+
+  const result: ComponentsMap = {};
+
+  for (const pattern of patterns) {
+    const files = await globFiles(pattern, root);
+
+    for (const file of files) {
+      const baseName = path.basename(file, path.extname(file));
+      const componentName = toPascalCase(baseName);
+      const relativePath = './' + path.relative(root, file).replace(/\\/g, '/');
+
+      result[componentName] = relativePath;
+    }
+  }
+
+  return result;
+}
+
+async function globFiles(pattern: string, root: string): Promise<string[]> {
+  const files: string[] = [];
+  const isGlob = pattern.includes('*');
+
+  if (!isGlob) {
+    const fullPath = path.resolve(root, pattern);
+    if (fs.existsSync(fullPath)) {
+      files.push(fullPath);
+    }
+    return files;
+  }
+
+  const parts = pattern.split('*');
+  const baseDir = path.resolve(root, parts[0]);
+  const ext = parts[1] || '';
+
+  if (!fs.existsSync(baseDir)) {
+    return files;
+  }
+
+  if (pattern.includes('**')) {
+    await walkDir(baseDir, files, ext);
+  } else {
+    const entries = await fs.promises.readdir(baseDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith(ext)) {
+        files.push(path.join(baseDir, entry.name));
+      }
+    }
+  }
+
+  return files;
+}
+
+async function walkDir(dir: string, files: string[], ext: string): Promise<void> {
+  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      await walkDir(fullPath, files, ext);
+    } else if (entry.isFile() && entry.name.endsWith(ext)) {
+      files.push(fullPath);
+    }
+  }
+}
+
+function toPascalCase(str: string): string {
+  return str
+    .replace(/[-_](\w)/g, (_, c) => c.toUpperCase())
+    .replace(/^\w/, (c) => c.toUpperCase());
 }
 
 export { oxContent } from 'vite-plugin-ox-content';

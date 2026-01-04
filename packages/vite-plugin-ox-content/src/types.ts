@@ -99,6 +99,13 @@ export interface OxContentOptions {
    * Custom AST transformers.
    */
   transformers?: MarkdownTransformer[];
+
+  /**
+   * Source documentation generation options.
+   * Set to false to disable (opt-out).
+   * @default { enabled: true }
+   */
+  docs?: DocsOptions | false;
 }
 
 /**
@@ -121,6 +128,7 @@ export interface ResolvedOptions {
   ogImage: boolean;
   ogImageOptions: OgImageOptions;
   transformers: MarkdownTransformer[];
+  docs: ResolvedDocsOptions | false;
 }
 
 /**
@@ -261,4 +269,125 @@ export interface TocEntry {
    * Child entries.
    */
   children: TocEntry[];
+}
+
+// ============================================
+// Source Documentation Types
+// ============================================
+
+/**
+ * Options for source documentation generation.
+ */
+export interface DocsOptions {
+  /**
+   * Enable/disable docs generation.
+   * @default true (opt-out)
+   */
+  enabled?: boolean;
+
+  /**
+   * Source directories to scan for documentation.
+   * @default ['./src']
+   */
+  src?: string[];
+
+  /**
+   * Output directory for generated documentation.
+   * @default 'docs/api'
+   */
+  out?: string;
+
+  /**
+   * Glob patterns for files to include.
+   * @default ['**\/*.ts', '**\/*.tsx']
+   */
+  include?: string[];
+
+  /**
+   * Glob patterns for files to exclude.
+   * @default ['**\/*.test.*', '**\/*.spec.*', 'node_modules']
+   */
+  exclude?: string[];
+
+  /**
+   * Output format.
+   * @default 'markdown'
+   */
+  format?: 'markdown' | 'json' | 'html';
+
+  /**
+   * Include private members in documentation.
+   * @default false
+   */
+  private?: boolean;
+
+  /**
+   * Generate table of contents for each file.
+   * @default true
+   */
+  toc?: boolean;
+
+  /**
+   * Group documentation by file or category.
+   * @default 'file'
+   */
+  groupBy?: 'file' | 'category';
+}
+
+/**
+ * Resolved docs options with all defaults applied.
+ */
+export interface ResolvedDocsOptions {
+  enabled: boolean;
+  src: string[];
+  out: string;
+  include: string[];
+  exclude: string[];
+  format: 'markdown' | 'json' | 'html';
+  private: boolean;
+  toc: boolean;
+  groupBy: 'file' | 'category';
+}
+
+/**
+ * A single documentation entry extracted from source.
+ */
+export interface DocEntry {
+  name: string;
+  kind: 'function' | 'class' | 'interface' | 'type' | 'variable' | 'module';
+  description: string;
+  params?: ParamDoc[];
+  returns?: ReturnDoc;
+  examples?: string[];
+  tags?: Record<string, string>;
+  private?: boolean;
+  file: string;
+  line: number;
+}
+
+/**
+ * Parameter documentation.
+ */
+export interface ParamDoc {
+  name: string;
+  type: string;
+  description: string;
+  optional?: boolean;
+  default?: string;
+}
+
+/**
+ * Return type documentation.
+ */
+export interface ReturnDoc {
+  type: string;
+  description: string;
+}
+
+/**
+ * Extracted documentation for a single file.
+ */
+export interface ExtractedDocs {
+  file: string;
+  entries: DocEntry[];
 }

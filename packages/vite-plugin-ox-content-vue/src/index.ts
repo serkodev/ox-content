@@ -5,13 +5,24 @@
  * Provides SSR and client environments for proper hydration.
  */
 
-import type { Plugin, PluginOption, Environment, DevEnvironment, BuildEnvironment } from 'vite';
+import * as fs from 'fs';
+import * as path from 'path';
+import type { Plugin, PluginOption, Environment, ResolvedConfig } from 'vite';
 import { oxContent, type OxContentOptions } from 'vite-plugin-ox-content';
 import { transformMarkdownWithVue } from './transform';
 import { createVueMarkdownEnvironment } from './environment';
-import type { VueIntegrationOptions, ResolvedVueOptions } from './types';
+import type { VueIntegrationOptions, ResolvedVueOptions, ComponentsMap, ComponentsOption } from './types';
 
-export type { VueIntegrationOptions } from './types';
+export type {
+  VueIntegrationOptions,
+  ResolvedVueOptions,
+  ComponentsOption,
+  ComponentsMap,
+  VueTransformResult,
+  ComponentSlot,
+  ParsedMarkdownContent,
+  TocEntry,
+} from './types';
 
 /**
  * Creates the Ox Content Vue integration plugin with Environment API support.
@@ -38,12 +49,32 @@ export type { VueIntegrationOptions } from './types';
  */
 export function oxContentVue(options: VueIntegrationOptions = {}): PluginOption[] {
   const resolved = resolveVueOptions(options);
-  const componentMap = new Map(Object.entries(resolved.components));
+  let componentMap = new Map<string, string>();
+  let config: ResolvedConfig;
+
+  // Pre-resolve components if it's a map (not glob)
+  if (typeof options.components === 'object' && !Array.isArray(options.components)) {
+    componentMap = new Map(Object.entries(options.components));
+  }
 
   // Main Vue transformation plugin
   const vueTransformPlugin: Plugin = {
     name: 'ox-content:vue-transform',
     enforce: 'pre',
+
+    async configResolved(resolvedConfig) {
+      config = resolvedConfig;
+
+      // Resolve glob patterns for components
+      const componentsOption = options.components;
+      if (componentsOption) {
+        const resolvedComponents = await resolveComponentsGlob(
+          componentsOption,
+          config.root
+        );
+        componentMap = new Map(Object.entries(resolvedComponents));
+      }
+    },
 
     async transform(code, id) {
       if (!id.endsWith('.md')) {
@@ -251,6 +282,109 @@ ${exports.join('\n')}
 
 export default components;
 `;
+}
+
+/**
+ * Resolves component glob patterns to a component map.
+ */
+async function resolveComponentsGlob(
+  componentsOption: ComponentsOption,
+  root: string
+): Promise<ComponentsMap> {
+  // If it's already a map, return as-is
+  if (typeof componentsOption === 'object' && !Array.isArray(componentsOption)) {
+    return componentsOption;
+  }
+
+  const patterns = Array.isArray(componentsOption)
+    ? componentsOption
+    : [componentsOption];
+
+  const result: ComponentsMap = {};
+
+  for (const pattern of patterns) {
+    const files = await globFiles(pattern, root);
+
+    for (const file of files) {
+      // Derive component name from file name (PascalCase)
+      const baseName = path.basename(file, path.extname(file));
+      const componentName = toPascalCase(baseName);
+      const relativePath = './' + path.relative(root, file).replace(/\\/g, '/');
+
+      result[componentName] = relativePath;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Simple glob matcher for component files.
+ */
+async function globFiles(pattern: string, root: string): Promise<string[]> {
+  const files: string[] = [];
+
+  // Parse glob pattern
+  const isGlob = pattern.includes('*');
+
+  if (!isGlob) {
+    // It's a direct path
+    const fullPath = path.resolve(root, pattern);
+    if (fs.existsSync(fullPath)) {
+      files.push(fullPath);
+    }
+    return files;
+  }
+
+  // Handle glob patterns like './src/components/*.vue'
+  const parts = pattern.split('*');
+  const baseDir = path.resolve(root, parts[0]);
+  const ext = parts[1] || '';
+
+  if (!fs.existsSync(baseDir)) {
+    return files;
+  }
+
+  // Handle ** recursive pattern
+  if (pattern.includes('**')) {
+    await walkDir(baseDir, files, ext);
+  } else {
+    // Single level glob
+    const entries = await fs.promises.readdir(baseDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith(ext)) {
+        files.push(path.join(baseDir, entry.name));
+      }
+    }
+  }
+
+  return files;
+}
+
+/**
+ * Recursively walks a directory.
+ */
+async function walkDir(dir: string, files: string[], ext: string): Promise<void> {
+  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      await walkDir(fullPath, files, ext);
+    } else if (entry.isFile() && entry.name.endsWith(ext)) {
+      files.push(fullPath);
+    }
+  }
+}
+
+/**
+ * Converts a string to PascalCase.
+ */
+function toPascalCase(str: string): string {
+  return str
+    .replace(/[-_](\w)/g, (_, c) => c.toUpperCase())
+    .replace(/^\w/, (c) => c.toUpperCase());
 }
 
 // Re-export

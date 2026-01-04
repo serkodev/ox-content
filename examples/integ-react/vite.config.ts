@@ -7,10 +7,8 @@ export default defineConfig({
     react(),
     oxContentReact({
       srcDir: 'docs',
-      components: {
-        Counter: './src/components/Counter.tsx',
-        Alert: './src/components/Alert.tsx',
-      },
+      // Auto-discover components using glob pattern
+      components: './src/components/*.tsx',
     }),
   ],
 });

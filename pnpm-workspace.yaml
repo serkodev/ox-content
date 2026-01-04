@@ -3,5 +3,31 @@ packages:
   - 'crates/ox_content_napi'
   # JavaScript packages
   - 'packages/*'
+  # Documentation
+  - 'docs'
   # Examples
   - 'examples/*'
+
+catalog:
+  # Build tools
+  vite: ^7.0.0
+  tsup: ^8.0.0
+  typescript: ^5.7.0
+
+  # Vue
+  vue: ^3.5.0
+  '@vitejs/plugin-vue': ^5.2.0
+
+  # React
+  react: ^19.0.0
+  react-dom: ^19.0.0
+  '@vitejs/plugin-react': ^4.0.0
+  '@types/react': ^19.0.0
+  '@types/react-dom': ^19.0.0
+
+  # Svelte
+  svelte: ^5.0.0
+  '@sveltejs/vite-plugin-svelte': ^5.0.0
+
+  # Types
+  '@types/node': ^22.0.0

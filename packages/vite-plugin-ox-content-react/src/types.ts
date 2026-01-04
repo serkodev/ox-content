@@ -2,8 +2,28 @@ import type { OxContentOptions } from 'vite-plugin-ox-content';
 
 export type ComponentsMap = Record<string, string>;
 
+/**
+ * Component registration options.
+ * Can be a map, a glob pattern, or an array of glob patterns.
+ */
+export type ComponentsOption = ComponentsMap | string | string[];
+
 export interface ReactIntegrationOptions extends OxContentOptions {
-  components?: ComponentsMap;
+  /**
+   * Components to register for use in Markdown.
+   * Can be a map of names to paths, a glob pattern, or an array of globs.
+   * When using glob patterns, component names are derived from file names.
+   *
+   * @example
+   * ```ts
+   * // Glob pattern (recommended)
+   * components: './src/components/*.tsx'
+   *
+   * // Explicit map
+   * components: { Counter: './src/components/Counter.tsx' }
+   * ```
+   */
+  components?: ComponentsOption;
   jsxRuntime?: 'automatic' | 'classic';
 }
 

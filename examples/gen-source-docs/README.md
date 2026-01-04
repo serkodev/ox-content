@@ -1,25 +1,66 @@
-# Source Code Documentation Example
+# Source Documentation Generator Example
 
-This example demonstrates how Ox Content can generate documentation from source code, similar to `cargo doc` for Rust.
+This example demonstrates **dogfooding** - using Ox Content's own tools to generate documentation for source files, with Vue components embedded for interactive documentation.
 
-## Installation
+## Features
 
-```bash
-npm install
+- **Auto-generated API docs**: Extracts JSDoc/TSDoc comments from source files
+- **Vue components**: Embed interactive components in the generated documentation
+- **Glob pattern support**: Auto-discover components without listing each one
+
+## Configuration
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { oxContent } from 'vite-plugin-ox-content';
+import { oxContentVue } from 'vite-plugin-ox-content-vue';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+
+    // Base plugin with docs generation (builtin, opt-out)
+    oxContent({
+      srcDir: 'docs',
+      docs: {
+        enabled: true,
+        src: ['./src'],
+        out: 'docs/api',
+        include: ['**/*.ts'],
+      },
+    }),
+
+    // Vue integration with glob pattern
+    oxContentVue({
+      srcDir: 'docs',
+      components: './src/components/*.vue',
+    }),
+  ],
+});
 ```
 
 ## Usage
 
 ```bash
-npm start
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
 ```
 
 ## How It Works
 
-1. Parse source files for documentation comments
-2. Extract JSDoc/TSDoc annotations
-3. Generate Markdown documentation
-4. Render with Ox Content
+1. **Docs Generation**: The base `oxContent` plugin scans source files for JSDoc comments and generates Markdown documentation automatically.
+
+2. **Vue Components**: The `oxContentVue` plugin enables embedding Vue components in Markdown using glob patterns for easy component discovery.
+
+3. **Dogfooding**: This example uses Ox Content to document its own example source files, demonstrating the tool's capabilities.
 
 ## Supported Comment Formats
 
@@ -55,11 +96,3 @@ export interface User {
   name: string;
 }
 ```
-
-## Integration with Ox Content
-
-The generated Markdown is then processed by Ox Content for:
-- High-performance parsing
-- Syntax highlighting
-- Cross-referencing
-- Search indexing

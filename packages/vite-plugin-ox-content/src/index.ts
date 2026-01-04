@@ -5,12 +5,22 @@
  * Provides separate environments for client and server rendering.
  */
 
+import * as path from 'path';
 import type { Plugin, ViteDevServer, ResolvedConfig } from 'vite';
 import { createMarkdownEnvironment } from './environment';
 import { transformMarkdown } from './transform';
+import { extractDocs, generateMarkdown, writeDocs, resolveDocsOptions } from './docs';
 import type { OxContentOptions, ResolvedOptions } from './types';
 
 export type { OxContentOptions } from './types';
+export type {
+  DocsOptions,
+  ResolvedDocsOptions,
+  DocEntry,
+  ParamDoc,
+  ReturnDoc,
+  ExtractedDocs,
+} from './types';
 
 /**
  * Creates the Ox Content Vite plugin.
@@ -128,7 +138,77 @@ export function oxContent(options: OxContentOptions = {}): Plugin[] {
     },
   };
 
-  return [mainPlugin, environmentPlugin];
+  // Docs generation plugin (builtin, opt-out)
+  const docsPlugin: Plugin = {
+    name: 'ox-content:docs',
+
+    async buildStart() {
+      const docsOptions = resolvedOptions.docs;
+      if (!docsOptions || !docsOptions.enabled) {
+        return;
+      }
+
+      // Generate docs at build start
+      const root = config?.root || process.cwd();
+      const srcDirs = docsOptions.src.map((src) => path.resolve(root, src));
+      const outDir = path.resolve(root, docsOptions.out);
+
+      try {
+        const extracted = await extractDocs(srcDirs, docsOptions);
+
+        if (extracted.length > 0) {
+          const generated = generateMarkdown(extracted, docsOptions);
+          await writeDocs(generated, outDir);
+
+          console.log(
+            `[ox-content] Generated ${Object.keys(generated).length} documentation files to ${docsOptions.out}`
+          );
+        }
+      } catch (err) {
+        console.warn('[ox-content] Failed to generate documentation:', err);
+      }
+    },
+
+    configureServer(devServer) {
+      const docsOptions = resolvedOptions.docs;
+      if (!docsOptions || !docsOptions.enabled) {
+        return;
+      }
+
+      // Watch source directories for changes
+      const root = config?.root || process.cwd();
+      const srcDirs = docsOptions.src.map((src) => path.resolve(root, src));
+
+      for (const srcDir of srcDirs) {
+        devServer.watcher.add(srcDir);
+      }
+
+      // Regenerate docs on file changes
+      devServer.watcher.on('change', async (file) => {
+        const isSourceFile = srcDirs.some(
+          (srcDir) =>
+            file.startsWith(srcDir) &&
+            (file.endsWith('.ts') || file.endsWith('.tsx'))
+        );
+
+        if (isSourceFile) {
+          const outDir = path.resolve(root, docsOptions.out);
+
+          try {
+            const extracted = await extractDocs(srcDirs, docsOptions);
+            if (extracted.length > 0) {
+              const generated = generateMarkdown(extracted, docsOptions);
+              await writeDocs(generated, outDir);
+            }
+          } catch {
+            // Ignore errors during dev
+          }
+        }
+      });
+    },
+  };
+
+  return [mainPlugin, environmentPlugin, docsPlugin];
 }
 
 /**
@@ -152,6 +232,7 @@ function resolveOptions(options: OxContentOptions): ResolvedOptions {
     ogImage: options.ogImage ?? false,
     ogImageOptions: options.ogImageOptions ?? {},
     transformers: options.transformers ?? [],
+    docs: resolveDocsOptions(options.docs),
   };
 }
 
@@ -185,4 +266,5 @@ function generateVirtualModule(
 // Re-export types and utilities
 export { createMarkdownEnvironment } from './environment';
 export { transformMarkdown } from './transform';
+export { extractDocs, generateMarkdown, writeDocs, resolveDocsOptions } from './docs';
 export * from './types';

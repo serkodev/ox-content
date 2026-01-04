@@ -11,21 +11,46 @@ import type { OxContentOptions } from 'vite-plugin-ox-content';
 export type ComponentsMap = Record<string, string>;
 
 /**
+ * Component registration options.
+ * Can be a map, a glob pattern, or an array of glob patterns.
+ *
+ * @example
+ * ```ts
+ * // Using a glob pattern
+ * components: './src/components/*.vue'
+ *
+ * // Using multiple glob patterns
+ * components: ['./src/components/*.vue', './src/ui/*.vue']
+ *
+ * // Using a map for explicit names
+ * components: {
+ *   Counter: './src/components/Counter.vue',
+ * }
+ * ```
+ */
+export type ComponentsOption = ComponentsMap | string | string[];
+
+/**
  * Vue integration plugin options.
  */
 export interface VueIntegrationOptions extends OxContentOptions {
   /**
-   * Map of component names to their import paths.
+   * Components to register for use in Markdown.
+   * Can be a map of names to paths, a glob pattern, or an array of globs.
+   * When using glob patterns, component names are derived from file names.
    *
    * @example
    * ```ts
+   * // Glob pattern (recommended)
+   * components: './src/components/*.vue'
+   *
+   * // Explicit map
    * components: {
    *   Counter: './src/components/Counter.vue',
-   *   Alert: './src/components/Alert.vue',
    * }
    * ```
    */
-  components?: ComponentsMap;
+  components?: ComponentsOption;
 
   /**
    * Enable Vue Reactivity Transform.

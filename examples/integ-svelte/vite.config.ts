@@ -7,10 +7,8 @@ export default defineConfig({
     svelte(),
     oxContentSvelte({
       srcDir: 'docs',
-      components: {
-        Counter: './src/components/Counter.svelte',
-        Alert: './src/components/Alert.svelte',
-      },
+      // Auto-discover components using glob pattern
+      components: './src/components/*.svelte',
     }),
   ],
 });
