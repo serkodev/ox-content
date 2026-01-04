@@ -7,7 +7,7 @@ import { oxContent } from "vite-plugin-ox-content";
 var COMPONENT_REGEX = /<([A-Z][a-zA-Z0-9]*)\s*([^>]*?)\s*\/?>(?:<\/\1>)?/g;
 var PROP_REGEX = /([a-zA-Z0-9-]+)(?:=(?:"([^"]*)"|'([^']*)'|{([^}]*)}))?/g;
 async function transformMarkdownWithSvelte(code, id, options) {
-  const { components } = options;
+  const components = options.components;
   const usedComponents = [];
   const slots = [];
   let slotIndex = 0;
@@ -16,7 +16,7 @@ async function transformMarkdownWithSvelte(code, id, options) {
   let match;
   while ((match = COMPONENT_REGEX.exec(markdownContent)) !== null) {
     const [fullMatch, componentName, propsString] = match;
-    if (components.has(componentName)) {
+    if (componentName in components) {
       if (!usedComponents.includes(componentName)) {
         usedComponents.push(componentName);
       }
@@ -94,7 +94,7 @@ function parseProps(propsString) {
   return props;
 }
 function generateSvelteModule(content, usedComponents, slots, frontmatter, options) {
-  const imports = usedComponents.map((name) => `import ${name} from '${options.components.get(name)}';`).join("\n");
+  const imports = usedComponents.map((name) => `import ${name} from '${options.components[name]}';`).join("\n");
   const componentRendering = slots.map((slot) => {
     const propsStr = Object.entries(slot.props).map(([k, v]) => `${k}={${JSON.stringify(v)}}`).join(" ");
     return `{#if slotId === '${slot.id}'}<${slot.name} ${propsStr} />{/if}`;
@@ -186,8 +186,8 @@ function oxContentSvelte(options = {}) {
         return null;
       }
       const result = await transformMarkdownWithSvelte(code, id, {
-        components: componentMap,
-        ...resolved
+        ...resolved,
+        components: Object.fromEntries(componentMap)
       });
       return {
         code: result.code,
@@ -200,8 +200,8 @@ function oxContentSvelte(options = {}) {
     config() {
       return {
         environments: {
-          "ox-content-ssr": createSvelteMarkdownEnvironment("ssr", resolved),
-          "ox-content-client": createSvelteMarkdownEnvironment("client", resolved)
+          oxcontent_ssr: createSvelteMarkdownEnvironment("ssr", resolved),
+          oxcontent_client: createSvelteMarkdownEnvironment("client", resolved)
         }
       };
     },
@@ -224,7 +224,7 @@ function oxContentSvelte(options = {}) {
       return null;
     },
     applyToEnvironment(environment) {
-      return ["ox-content-ssr", "ox-content-client", "client", "ssr"].includes(
+      return ["oxcontent_ssr", "oxcontent_client", "client", "ssr"].includes(
         environment.name
       );
     }
@@ -270,7 +270,6 @@ function resolveSvelteOptions(options) {
     frontmatter: options.frontmatter ?? true,
     toc: options.toc ?? true,
     tocMaxDepth: options.tocMaxDepth ?? 3,
-    components: options.components ?? {},
     runes: options.runes ?? true
   };
 }

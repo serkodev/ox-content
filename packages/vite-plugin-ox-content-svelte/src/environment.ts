@@ -1,9 +1,8 @@
 import type { EnvironmentOptions } from 'vite';
-import type { ResolvedSvelteOptions } from './types';
 
 export function createSvelteMarkdownEnvironment(
   mode: 'ssr' | 'client',
-  options: ResolvedSvelteOptions
+  options: { outDir: string }
 ): EnvironmentOptions {
   const isSSR = mode === 'ssr';
 

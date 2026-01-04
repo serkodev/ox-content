@@ -42,7 +42,7 @@ var import_vite_plugin_ox_content = require("vite-plugin-ox-content");
 var COMPONENT_REGEX = /<([A-Z][a-zA-Z0-9]*)\s*([^>]*?)\s*\/?>(?:<\/\1>)?/g;
 var PROP_REGEX = /([a-zA-Z0-9-]+)(?:=(?:"([^"]*)"|'([^']*)'|{([^}]*)}))?/g;
 async function transformMarkdownWithReact(code, id, options) {
-  const { components } = options;
+  const components = options.components;
   const usedComponents = [];
   const slots = [];
   let slotIndex = 0;
@@ -51,7 +51,7 @@ async function transformMarkdownWithReact(code, id, options) {
   let match;
   while ((match = COMPONENT_REGEX.exec(markdownContent)) !== null) {
     const [fullMatch, componentName, propsString] = match;
-    if (components.has(componentName)) {
+    if (componentName in components) {
       if (!usedComponents.includes(componentName)) {
         usedComponents.push(componentName);
       }
@@ -129,7 +129,7 @@ function parseProps(propsString) {
   return props;
 }
 function generateReactModule(content, usedComponents, slots, frontmatter, options) {
-  const imports = usedComponents.map((name) => `import ${name} from '${options.components.get(name)}';`).join("\n");
+  const imports = usedComponents.map((name) => `import ${name} from '${options.components[name]}';`).join("\n");
   return `
 import React, { useState, useEffect } from 'react';
 ${imports}
@@ -218,8 +218,8 @@ function oxContentReact(options = {}) {
         return null;
       }
       const result = await transformMarkdownWithReact(code, id, {
-        components: componentMap,
-        ...resolved
+        ...resolved,
+        components: Object.fromEntries(componentMap)
       });
       return {
         code: result.code,
@@ -230,10 +230,14 @@ function oxContentReact(options = {}) {
   const reactEnvironmentPlugin = {
     name: "ox-content:react-environment",
     config() {
+      const envOptions = {
+        ...resolved,
+        components: Object.fromEntries(componentMap)
+      };
       return {
         environments: {
-          "ox-content-ssr": createReactMarkdownEnvironment("ssr", resolved),
-          "ox-content-client": createReactMarkdownEnvironment("client", resolved)
+          oxcontent_ssr: createReactMarkdownEnvironment("ssr", envOptions),
+          oxcontent_client: createReactMarkdownEnvironment("client", envOptions)
         }
       };
     },
@@ -256,7 +260,7 @@ function oxContentReact(options = {}) {
       return null;
     },
     applyToEnvironment(environment) {
-      return ["ox-content-ssr", "ox-content-client", "client", "ssr"].includes(
+      return ["oxcontent_ssr", "oxcontent_client", "client", "ssr"].includes(
         environment.name
       );
     }
@@ -302,7 +306,6 @@ function resolveReactOptions(options) {
     frontmatter: options.frontmatter ?? true,
     toc: options.toc ?? true,
     tocMaxDepth: options.tocMaxDepth ?? 3,
-    components: options.components ?? {},
     jsxRuntime: options.jsxRuntime ?? "automatic"
   };
 }

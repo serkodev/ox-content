@@ -165,7 +165,7 @@ export function oxContentSvelte(options: SvelteIntegrationOptions = {}): PluginO
   ];
 }
 
-function resolveSvelteOptions(options: SvelteIntegrationOptions): ResolvedSvelteOptions {
+function resolveSvelteOptions(options: SvelteIntegrationOptions): Omit<ResolvedSvelteOptions, 'components'> {
   return {
     srcDir: options.srcDir ?? 'docs',
     outDir: options.outDir ?? 'dist',
@@ -174,7 +174,6 @@ function resolveSvelteOptions(options: SvelteIntegrationOptions): ResolvedSvelte
     frontmatter: options.frontmatter ?? true,
     toc: options.toc ?? true,
     tocMaxDepth: options.tocMaxDepth ?? 3,
-    components: options.components ?? {},
     runes: options.runes ?? true,
   };
 }
