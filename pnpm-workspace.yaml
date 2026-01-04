@@ -1,0 +1,7 @@
+packages:
+  # NAPI bindings
+  - 'crates/ox_content_napi'
+  # JavaScript packages
+  - 'packages/*'
+  # Examples
+  - 'examples/*'

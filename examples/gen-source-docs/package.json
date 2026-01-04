@@ -1,0 +1,15 @@
+{
+  "name": "ox-content-source-docs-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "node index.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@ox-content/napi": "workspace:*"
+  }
+}

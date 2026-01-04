@@ -1,0 +1,143 @@
+[tools]
+rust = "1.83"
+node = "22"
+
+[env]
+RUST_BACKTRACE = "1"
+
+[tasks.build]
+description = "Build all crates"
+run = "cargo build --workspace"
+
+[tasks.build-release]
+description = "Build all crates in release mode"
+run = "cargo build --workspace --release"
+
+[tasks.test]
+description = "Run all tests"
+run = "cargo test --workspace"
+
+[tasks.test-verbose]
+description = "Run all tests with verbose output"
+run = "cargo test --workspace -- --nocapture"
+
+[tasks.check]
+description = "Check all crates"
+run = "cargo check --workspace"
+
+[tasks.clippy]
+description = "Run clippy on all crates"
+run = "cargo clippy --workspace --all-targets -- -D warnings"
+
+[tasks.fmt]
+description = "Format all code"
+run = "cargo fmt --all"
+
+[tasks.fmt-check]
+description = "Check code formatting"
+run = "cargo fmt --all -- --check"
+
+[tasks.lint]
+description = "Run all lints (clippy + fmt-check)"
+depends = ["clippy", "fmt-check"]
+
+[tasks.bench]
+description = "Run benchmarks"
+run = "cargo bench --workspace"
+
+[tasks.doc]
+description = "Generate documentation"
+run = "cargo doc --workspace --no-deps"
+
+[tasks.doc-open]
+description = "Generate and open documentation"
+run = "cargo doc --workspace --no-deps --open"
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = "cargo clean"
+
+[tasks.napi-build]
+description = "Build NAPI bindings"
+dir = "crates/ox_content_napi"
+run = "napi build --release"
+
+[tasks.napi-prepublish]
+description = "Prepare NAPI package for publishing"
+dir = "crates/ox_content_napi"
+run = "napi prepublish"
+
+[tasks.ci]
+description = "Run CI checks"
+depends = ["fmt-check", "clippy", "test"]
+
+[tasks.ready]
+description = "Run all checks before committing"
+depends = ["fmt", "clippy", "test"]
+
+[tasks.coverage]
+description = "Generate test coverage report"
+run = "cargo llvm-cov --workspace --html"
+
+[tasks.setup]
+description = "Setup development environment"
+run = """
+rustup component add clippy rustfmt
+cargo install cargo-watch cargo-llvm-cov
+"""
+
+[tasks.watch]
+description = "Watch for changes and run tests"
+run = "cargo watch -x test"
+
+[tasks.watch-check]
+description = "Watch for changes and run check"
+run = "cargo watch -x check"
+
+[tasks.playground]
+description = "Start the playground"
+dir = "examples/playground"
+run = "npm run dev"
+
+[tasks.integ-vue]
+description = "Start Vue integration example"
+dir = "examples/integ-vue"
+run = "npm run dev"
+
+[tasks.integ-react]
+description = "Start React integration example"
+dir = "examples/integ-react"
+run = "npm run dev"
+
+[tasks.integ-svelte]
+description = "Start Svelte integration example"
+dir = "examples/integ-svelte"
+run = "npm run dev"
+
+[tasks.ssg-vite]
+description = "Start Vite SSG example"
+dir = "examples/ssg-vite"
+run = "npm run dev"
+
+[tasks.plugin-markdown-it]
+description = "Run markdown-it plugin example"
+dir = "examples/plugin-markdown-it"
+run = "npm start"
+
+[tasks.plugin-rehype]
+description = "Run rehype plugin example"
+dir = "examples/plugin-rehype"
+run = "npm start"
+
+[tasks.gen-source-docs]
+description = "Run source docs generator example"
+dir = "examples/gen-source-docs"
+run = "npm start"
+
+[tasks.install]
+description = "Install all dependencies with pnpm"
+run = "pnpm install"
+
+[tasks.examples-install]
+description = "Install all example dependencies"
+depends = ["install"]
