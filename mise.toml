@@ -97,42 +97,42 @@ run = "cargo watch -x check"
 [tasks.playground]
 description = "Start the playground"
 dir = "examples/playground"
-run = "npm run dev"
+run = "pnpm run dev"
 
 [tasks.integ-vue]
 description = "Start Vue integration example"
 dir = "examples/integ-vue"
-run = "npm run dev"
+run = "pnpm run dev"
 
 [tasks.integ-react]
 description = "Start React integration example"
 dir = "examples/integ-react"
-run = "npm run dev"
+run = "pnpm run dev"
 
 [tasks.integ-svelte]
 description = "Start Svelte integration example"
 dir = "examples/integ-svelte"
-run = "npm run dev"
+run = "pnpm run dev"
 
 [tasks.ssg-vite]
 description = "Start Vite SSG example"
 dir = "examples/ssg-vite"
-run = "npm run dev"
+run = "pnpm run dev"
 
 [tasks.plugin-markdown-it]
 description = "Run markdown-it plugin example"
 dir = "examples/plugin-markdown-it"
-run = "npm start"
+run = "pnpm run start"
 
 [tasks.plugin-rehype]
 description = "Run rehype plugin example"
 dir = "examples/plugin-rehype"
-run = "npm start"
+run = "pnpm run start"
 
 [tasks.gen-source-docs]
 description = "Run source docs generator example"
 dir = "examples/gen-source-docs"
-run = "npm run dev"
+run = "pnpm run dev"
 
 [tasks.packages-build]
 description = "Build all vite-plugin packages"
