@@ -177,59 +177,39 @@ const { html, frontmatter } = parseAndRender(content, {
 
 ### Plugin Compatibility
 
-Ox Content integrates with existing Markdown plugin ecosystems:
-
-#### markdown-it
-
-Use Ox Content's fast parser with the markdown-it plugin ecosystem:
-
-```javascript
-import MarkdownIt from 'markdown-it';
-import { oxContentPlugin } from '@ox-content/markdown-it';
-
-const md = new MarkdownIt();
-md.use(oxContentPlugin, { gfm: true });
-
-const html = md.render('# Hello World');
-```
-
-#### remark / unified
-
-Integrate with remark plugins via unplugin:
+Ox Content supports plugins from existing Markdown ecosystems via unplugin:
 
 ```typescript
 // vite.config.ts
 import oxContent from 'unplugin-ox-content/vite';
+
+// markdown-it plugins
+import markdownItToc from 'markdown-it-toc-done-right';
+
+// remark plugins
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
+
+// rehype plugins
+import rehypeHighlight from 'rehype-highlight';
+import rehypeSlug from 'rehype-slug';
 
 export default defineConfig({
   plugins: [
     oxContent({
-      remarkPlugins: [remarkGfm, remarkToc],
+      plugin: {
+        // markdown-it plugins
+        markdownIt: [markdownItToc],
+        // remark plugins (unified)
+        remark: [remarkGfm, remarkToc],
+        // rehype plugins (unified)
+        rehype: [rehypeHighlight, rehypeSlug],
+        // native ox-content plugins
+        oxContent: [(html) => html.replace(/foo/g, 'bar')],
+      },
     }),
   ],
 });
-```
-
-#### rehype
-
-Post-process HTML output with rehype plugins:
-
-```javascript
-import { unified } from 'unified';
-import rehypeParse from 'rehype-parse';
-import rehypeHighlight from 'rehype-highlight';
-import rehypeStringify from 'rehype-stringify';
-import { parseAndRender } from '@ox-content/napi';
-
-const { html } = parseAndRender(markdown, { gfm: true });
-
-const result = await unified()
-  .use(rehypeParse, { fragment: true })
-  .use(rehypeHighlight)
-  .use(rehypeStringify)
-  .process(html);
 ```
 
 See the [examples](https://github.com/ubugeeei/ox-content/tree/main/examples) for complete integration samples.
