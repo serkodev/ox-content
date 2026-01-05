@@ -279,8 +279,10 @@ ox-content/
 │   │   └── ...             # Vite plugin
 │   ├── ox_content_og_image/
 │   │   └── ...             # OG image generation
-│   └── ox_content_docs/
-│       └── ...             # Source code documentation
+│   ├── ox_content_docs/
+│   │   └── ...             # Source code documentation
+│   └── ox_content_wasm/
+│       └── ...             # WebAssembly bindings
 ├── playground/             # Interactive web playground
 │   ├── package.json
 │   ├── vite.config.ts

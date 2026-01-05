@@ -157,7 +157,14 @@ const { html, frontmatter } = parseAndRender(content, {
 | `ox_content_parser` | Markdown parser | CommonMark + GFM, streaming support |
 | `ox_content_renderer` | HTML renderer | Customizable, XHTML support, sanitization |
 | `ox_content_napi` | Node.js bindings | napi-rs, TypeScript types |
+| `ox_content_wasm` | WebAssembly bindings | wasm-bindgen, Browser & Deno support |
 | `ox_content_og_image` | OG images | SVG-based, customizable templates |
+
+### Unplugin
+
+| Package | Description | Key Features |
+|---------|-------------|--------------|
+| [unplugin-ox-content](./packages/unplugin-ox-content.md) | Universal plugin | Vite, Webpack, Rollup, esbuild support |
 
 ### Vite Plugins
 
