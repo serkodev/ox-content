@@ -206,7 +206,7 @@ function generateVueSFC(
   usedComponents: string[],
   slots: ComponentSlot[],
   frontmatter: Record<string, unknown>,
-  options: ResolvedVueOptions & { components: Map<string, string>; root?: string },
+  options: TransformOptions,
   id: string
 ): string {
   const mdDir = path.dirname(id);
