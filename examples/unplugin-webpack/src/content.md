@@ -3,16 +3,16 @@ title: Hello from unplugin-ox-content
 author: ox-content
 ---
 
-# Welcome to unplugin-ox-content
+# Welcome to unplugin-ox-content :tada:
 
 This is a **Markdown** file processed by `unplugin-ox-content`.
 
-## Features
+## Features :rocket:
 
-- Works with **webpack**
-- Works with **rollup**
-- Works with **esbuild**
-- Works with **vite**
+- Works with **webpack** :white_check_mark:
+- Works with **rollup** :white_check_mark:
+- Works with **esbuild** :white_check_mark:
+- Works with **vite** :white_check_mark:
 
 ## Code Example
 
@@ -31,4 +31,4 @@ console.log(message);
 
 > This is a blockquote.
 
-That's it!
+That's it! :sparkles:

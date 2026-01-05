@@ -10,7 +10,17 @@ import { createFilter } from '@rollup/pluginutils';
 import { transformMarkdown } from './transform';
 import type { OxContentOptions, ResolvedOptions } from './types';
 
-export type { OxContentOptions, ResolvedOptions, TocEntry, TransformResult } from './types';
+export type {
+  OxContentOptions,
+  ResolvedOptions,
+  TocEntry,
+  TransformResult,
+  PluginConfig,
+  OxContentPlugin,
+  MarkdownItPlugin,
+  RemarkPlugin,
+  RehypePlugin,
+} from './types';
 export { transformMarkdown } from './transform';
 
 /**
@@ -42,6 +52,12 @@ function resolveOptions(options: OxContentOptions): ResolvedOptions {
       : options.exclude
         ? [options.exclude]
         : [],
+    plugin: {
+      oxContent: options.plugin?.oxContent ?? [],
+      markdownIt: options.plugin?.markdownIt ?? [],
+      remark: options.plugin?.remark ?? [],
+      rehype: options.plugin?.rehype ?? [],
+    },
   };
 }
 

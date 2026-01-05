@@ -1,6 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import oxContent from 'unplugin-ox-content/webpack';
+import { full as emoji } from 'markdown-it-emoji';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -27,6 +28,10 @@ export default {
     oxContent({
       gfm: true,
       toc: true,
+      // Example: Using markdown-it plugins
+      plugin: {
+        markdownIt: [emoji],
+      },
     }),
   ],
 };

@@ -2,6 +2,66 @@
  * Type definitions for unplugin-ox-content
  */
 
+import type MarkdownIt from 'markdown-it';
+
+/**
+ * Markdown-it plugin function type.
+ */
+type MarkdownItPluginFn = (md: MarkdownIt, ...options: unknown[]) => void;
+
+/**
+ * Markdown-it plugin type.
+ * Can be a single plugin or a tuple of [plugin, ...options].
+ */
+export type MarkdownItPlugin = MarkdownItPluginFn | [MarkdownItPluginFn, ...unknown[]];
+
+/**
+ * Remark plugin type.
+ * Can be a single plugin or a tuple of [plugin, options].
+ */
+export type RemarkPlugin = unknown | [unknown, unknown];
+
+/**
+ * Rehype plugin type.
+ * Can be a single plugin or a tuple of [plugin, options].
+ */
+export type RehypePlugin = unknown | [unknown, unknown];
+
+/**
+ * Ox-content native plugin type.
+ * Transforms HTML after rendering.
+ */
+export type OxContentPlugin = (html: string) => string | Promise<string>;
+
+/**
+ * Plugin configuration for various markdown ecosystems.
+ */
+export interface PluginConfig {
+  /**
+   * Ox-content native plugins.
+   * Transform HTML after rendering.
+   */
+  oxContent?: OxContentPlugin[];
+
+  /**
+   * Markdown-it plugins.
+   * @see https://www.npmjs.com/search?q=markdown-it-plugin
+   */
+  markdownIt?: MarkdownItPlugin[];
+
+  /**
+   * Remark plugins (unified ecosystem).
+   * @see https://github.com/remarkjs/remark/blob/main/doc/plugins.md
+   */
+  remark?: RemarkPlugin[];
+
+  /**
+   * Rehype plugins (unified ecosystem).
+   * @see https://github.com/rehypejs/rehype/blob/main/doc/plugins.md
+   */
+  rehype?: RehypePlugin[];
+}
+
 /**
  * Plugin options.
  */
@@ -93,6 +153,11 @@ export interface OxContentOptions {
    * Files/patterns to exclude.
    */
   exclude?: string | RegExp | (string | RegExp)[];
+
+  /**
+   * Plugin configuration for markdown processing.
+   */
+  plugin?: PluginConfig;
 }
 
 /**
@@ -114,6 +179,7 @@ export interface ResolvedOptions {
   extensions: string[];
   include: (string | RegExp)[];
   exclude: (string | RegExp)[];
+  plugin: Required<PluginConfig>;
 }
 
 /**
