@@ -40,6 +40,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ox-content/napi": "workspace:*",
     "@rollup/pluginutils": "^5.1.4",
     "gray-matter": "^4.0.3",
     "markdown-it": "^14.1.0",

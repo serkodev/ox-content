@@ -309,6 +309,9 @@ importers:
 
   packages/unplugin-ox-content:
     dependencies:
+      '@ox-content/napi':
+        specifier: workspace:*
+        version: link:../../crates/ox_content_napi
       '@rollup/pluginutils':
         specifier: ^5.1.4
         version: 5.3.0(rollup@4.54.0)
