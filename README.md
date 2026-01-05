@@ -24,6 +24,7 @@
 - **GFM Support** - Tables, task lists, strikethrough, autolinks, footnotes
 - **Multi-Runtime** - Node.js (NAPI), WebAssembly, Native Rust
 - **Framework Agnostic** - Works with Vite, Webpack, Rollup, esbuild via unplugin
+- **Plugin Compatible** - Works with markdown-it, remark, rehype ecosystems
 
 ## Quick Start
 

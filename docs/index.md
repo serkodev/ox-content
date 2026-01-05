@@ -175,6 +175,65 @@ const { html, frontmatter } = parseAndRender(content, {
 | [vite-plugin-ox-content-react](./packages/vite-plugin-ox-content-react.md) | React integration | Embed React components in Markdown |
 | [vite-plugin-ox-content-svelte](./packages/vite-plugin-ox-content-svelte.md) | Svelte integration | Embed Svelte 5 components in Markdown |
 
+### Plugin Compatibility
+
+Ox Content integrates with existing Markdown plugin ecosystems:
+
+#### markdown-it
+
+Use Ox Content's fast parser with the markdown-it plugin ecosystem:
+
+```javascript
+import MarkdownIt from 'markdown-it';
+import { oxContentPlugin } from '@ox-content/markdown-it';
+
+const md = new MarkdownIt();
+md.use(oxContentPlugin, { gfm: true });
+
+const html = md.render('# Hello World');
+```
+
+#### remark / unified
+
+Integrate with remark plugins via unplugin:
+
+```typescript
+// vite.config.ts
+import oxContent from 'unplugin-ox-content/vite';
+import remarkGfm from 'remark-gfm';
+import remarkToc from 'remark-toc';
+
+export default defineConfig({
+  plugins: [
+    oxContent({
+      remarkPlugins: [remarkGfm, remarkToc],
+    }),
+  ],
+});
+```
+
+#### rehype
+
+Post-process HTML output with rehype plugins:
+
+```javascript
+import { unified } from 'unified';
+import rehypeParse from 'rehype-parse';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeStringify from 'rehype-stringify';
+import { parseAndRender } from '@ox-content/napi';
+
+const { html } = parseAndRender(markdown, { gfm: true });
+
+const result = await unified()
+  .use(rehypeParse, { fragment: true })
+  .use(rehypeHighlight)
+  .use(rehypeStringify)
+  .process(html);
+```
+
+See the [examples](https://github.com/ubugeeei/ox-content/tree/main/examples) for complete integration samples.
+
 ## Quick Links
 
 - [Getting Started](./getting-started.md) - Installation and first steps
