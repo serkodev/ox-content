@@ -78,10 +78,6 @@ This is a **fast** Markdown parser written in Rust.
 - Zero-copy parsing
 - Arena allocation
 - GFM support
-
-```rust
-let x = 42;
-```
 "#;
 
     // Step 3: Parse the Markdown
