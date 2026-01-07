@@ -102,9 +102,8 @@ impl HtmlRenderer {
 
     /// Converts a `.md` URL to `.html` URL for SSG output.
     fn convert_md_url(&self, url: &str) -> String {
-        let is_md = std::path::Path::new(url)
-            .extension()
-            .is_some_and(|ext| ext.eq_ignore_ascii_case("md"));
+        let is_md =
+            std::path::Path::new(url).extension().is_some_and(|ext| ext.eq_ignore_ascii_case("md"));
 
         if !self.options.convert_md_links || !is_md {
             return url.to_string();
