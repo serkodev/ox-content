@@ -1,12 +1,17 @@
 packages:
   # NAPI bindings
   - 'crates/ox_content_napi'
+  # WASM bindings
+  - 'crates/ox_content_wasm/pkg'
   # JavaScript packages
   - 'packages/*'
   # Documentation
   - 'docs'
   # Examples
   - 'examples/*'
+  # Benchmarks
+  - 'benchmarks/*'
+  - 'benchmarks/bundle-size/apps/*'
 
 catalog:
   # Build tools

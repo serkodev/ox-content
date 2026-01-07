@@ -3,6 +3,75 @@
  */
 
 /**
+ * SSG (Static Site Generation) options.
+ */
+export interface SsgOptions {
+  /**
+   * Enable SSG mode.
+   * @default true
+   */
+  enabled?: boolean;
+
+  /**
+   * Output file extension.
+   * @default '.html'
+   */
+  extension?: string;
+
+  /**
+   * Clean output directory before build.
+   * @default false
+   */
+  clean?: boolean;
+
+  /**
+   * Bare HTML output (no navigation, no styles).
+   * Useful for benchmarking or when using custom layouts.
+   * @default false
+   */
+  bare?: boolean;
+
+  /**
+   * Site name for header and title suffix.
+   */
+  siteName?: string;
+
+  /**
+   * OG image URL for social sharing (static URL).
+   * If generateOgImage is enabled, this serves as the fallback.
+   */
+  ogImage?: string;
+
+  /**
+   * Generate OG images per page using Rust-based generator.
+   * When enabled, each page will have a unique OG image.
+   * @default false
+   */
+  generateOgImage?: boolean;
+
+  /**
+   * Site URL for generating absolute OG image URLs.
+   * Required for proper SNS sharing.
+   * Example: 'https://example.com'
+   */
+  siteUrl?: string;
+}
+
+/**
+ * Resolved SSG options.
+ */
+export interface ResolvedSsgOptions {
+  enabled: boolean;
+  extension: string;
+  clean: boolean;
+  bare: boolean;
+  siteName?: string;
+  ogImage?: string;
+  generateOgImage: boolean;
+  siteUrl?: string;
+}
+
+/**
  * Plugin options.
  */
 export interface OxContentOptions {
@@ -23,6 +92,13 @@ export interface OxContentOptions {
    * @default '/'
    */
   base?: string;
+
+  /**
+   * SSG (Static Site Generation) options.
+   * Set to false to disable SSG completely.
+   * @default { enabled: true }
+   */
+  ssg?: SsgOptions | boolean;
 
   /**
    * Enable GitHub Flavored Markdown extensions.
@@ -121,6 +197,7 @@ export interface ResolvedOptions {
   srcDir: string;
   outDir: string;
   base: string;
+  ssg: ResolvedSsgOptions;
   gfm: boolean;
   footnotes: boolean;
   tables: boolean;
@@ -339,6 +416,19 @@ export interface DocsOptions {
    * @default 'file'
    */
   groupBy?: 'file' | 'category';
+
+  /**
+   * GitHub repository URL for source code links.
+   * When provided, generated documentation will include links to source code.
+   * Example: 'https://github.com/ubugeeei/ox-content'
+   */
+  githubUrl?: string;
+
+  /**
+   * Generate navigation metadata file.
+   * @default true
+   */
+  generateNav?: boolean;
 }
 
 /**
@@ -354,6 +444,8 @@ export interface ResolvedDocsOptions {
   private: boolean;
   toc: boolean;
   groupBy: 'file' | 'category';
+  githubUrl?: string;
+  generateNav: boolean;
 }
 
 /**
@@ -370,6 +462,7 @@ export interface DocEntry {
   private?: boolean;
   file: string;
   line: number;
+  signature?: string; // Full function/type signature (for functions and type aliases)
 }
 
 /**
@@ -397,4 +490,24 @@ export interface ReturnDoc {
 export interface ExtractedDocs {
   file: string;
   entries: DocEntry[];
+}
+
+/**
+ * Navigation item for sidebar navigation.
+ */
+export interface NavItem {
+  /**
+   * Display title for the navigation item.
+   */
+  title: string;
+
+  /**
+   * Path to the documentation page.
+   */
+  path: string;
+
+  /**
+   * Child navigation items (optional).
+   */
+  children?: NavItem[];
 }

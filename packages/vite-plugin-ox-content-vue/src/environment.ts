@@ -43,11 +43,6 @@ export function createVueMarkdownEnvironment(
 
     resolve: {
       conditions: isSSR ? ['node', 'import'] : ['browser', 'import'],
-
-      alias: {
-        // Ensure Vue resolves correctly for each environment
-        vue: isSSR ? 'vue/dist/vue.runtime.esm-bundler.js' : 'vue',
-      },
     },
 
     optimizeDeps: {

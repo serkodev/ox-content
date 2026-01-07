@@ -17,6 +17,47 @@ export interface RenderResult {
   /** Render errors, if any. */
   errors: Array<string>
 }
+/** Table of contents entry. */
+export interface TocEntry {
+  /** Heading depth (1-6). */
+  depth: number
+  /** Heading text. */
+  text: string
+  /** URL-friendly slug. */
+  slug: string
+}
+/** Transform result containing HTML, frontmatter, and TOC. */
+export interface TransformResult {
+  /** The rendered HTML. */
+  html: string
+  /** Parsed frontmatter as JSON string. */
+  frontmatter: string
+  /** Table of contents entries. */
+  toc: Array<TocEntry>
+  /** Parse/render errors, if any. */
+  errors: Array<string>
+}
+/** Transform options for JavaScript. */
+export interface JsTransformOptions {
+  /** Enable GFM extensions. */
+  gfm?: boolean
+  /** Enable footnotes. */
+  footnotes?: boolean
+  /** Enable task lists. */
+  taskLists?: boolean
+  /** Enable tables. */
+  tables?: boolean
+  /** Enable strikethrough. */
+  strikethrough?: boolean
+  /** Enable autolinks. */
+  autolinks?: boolean
+  /** Maximum TOC depth (1-6). */
+  tocMaxDepth?: number
+  /** Convert `.md` links to `.html` links for SSG output. */
+  convertMdLinks?: boolean
+  /** Base URL for absolute link conversion (e.g., "/" or "/docs/"). */
+  baseUrl?: string
+}
 /** Parser options for JavaScript. */
 export interface JsParserOptions {
   /** Enable GFM extensions. */
@@ -44,3 +85,46 @@ export declare function parseAndRender(source: string, options?: JsParserOptions
 export declare function render(astJson: string): RenderResult
 /** Returns the version of ox_content_napi. */
 export declare function version(): string
+/**
+ * Transforms Markdown source into HTML, frontmatter, and TOC.
+ *
+ * This is the main entry point for unplugin-ox-content.
+ */
+export declare function transform(source: string, options?: JsTransformOptions | undefined | null): TransformResult
+/** Parses Markdown and renders to HTML asynchronously (runs on worker thread). */
+export declare function parseAndRenderAsync(source: string, options?: JsParserOptions | undefined | null): Promise<unknown>
+/** Transforms Markdown source asynchronously (runs on worker thread). */
+export declare function transformAsync(source: string, options?: JsTransformOptions | undefined | null): Promise<unknown>
+/** OG image configuration for JavaScript. */
+export interface JsOgImageConfig {
+  /** Image width in pixels. */
+  width?: number
+  /** Image height in pixels. */
+  height?: number
+  /** Background color (hex). */
+  backgroundColor?: string
+  /** Text color (hex). */
+  textColor?: string
+  /** Title font size. */
+  titleFontSize?: number
+  /** Description font size. */
+  descriptionFontSize?: number
+}
+/** OG image data for JavaScript. */
+export interface JsOgImageData {
+  /** Page title. */
+  title: string
+  /** Page description. */
+  description?: string
+  /** Site name. */
+  siteName?: string
+  /** Author name. */
+  author?: string
+}
+/**
+ * Generates an OG image as SVG.
+ *
+ * This function generates an SVG representation of an OG image
+ * that can be used for social media previews.
+ */
+export declare function generateOgImageSvg(data: JsOgImageData, config?: JsOgImageConfig | undefined | null): string

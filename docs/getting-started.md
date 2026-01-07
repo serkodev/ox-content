@@ -78,10 +78,6 @@ This is a **fast** Markdown parser written in Rust.
 - Zero-copy parsing
 - Arena allocation
 - GFM support
-
-```rust
-let x = 42;
-```
 "#;
 
     // Step 3: Parse the Markdown
@@ -236,6 +232,12 @@ mise run docs-open      # Generate and open in browser
 mise run playground         # Start playground dev server
 mise run playground-build   # Build playground for production
 mise run playground-install # Install playground dependencies
+
+# Benchmarks
+mise run bench              # Run all benchmarks (Rust + JS)
+mise run bench:rust         # Run Rust benchmarks only
+mise run bench:parse        # Run parse/render speed benchmarks
+mise run bench:bundle       # Run bundle size benchmarks
 ```
 
 ### Project Structure
@@ -279,8 +281,10 @@ ox-content/
 │   │   └── ...             # Vite plugin
 │   ├── ox_content_og_image/
 │   │   └── ...             # OG image generation
-│   └── ox_content_docs/
-│       └── ...             # Source code documentation
+│   ├── ox_content_docs/
+│   │   └── ...             # Source code documentation
+│   └── ox_content_wasm/
+│       └── ...             # WebAssembly bindings
 ├── playground/             # Interactive web playground
 │   ├── package.json
 │   ├── vite.config.ts
@@ -331,6 +335,28 @@ mise run watch
 # or
 cargo watch -x "test --workspace"
 ```
+
+## Running Benchmarks
+
+Ox Content includes comprehensive benchmarks to measure performance:
+
+```bash
+# Run all benchmarks
+mise run bench
+
+# Run only Rust benchmarks (cargo bench)
+mise run bench:rust
+
+# Run parse/render speed benchmarks (compares with marked, markdown-it, etc.)
+mise run bench:parse
+
+# Run bundle size benchmarks (compares with VitePress, Astro, etc.)
+mise run bench:bundle
+```
+
+### Benchmark Results
+
+See the [Benchmarks section](./index.md#benchmarks) for the latest results.
 
 ## Using the Playground
 
@@ -413,6 +439,79 @@ nvm use 22
 
 - [GitHub Issues](https://github.com/ubugeeei/ox-content/issues) - Bug reports and feature requests
 - [Discussions](https://github.com/ubugeeei/ox-content/discussions) - Questions and ideas
+
+## API Documentation Generation
+
+Ox Content can generate API documentation from your TypeScript/JavaScript source code, similar to `cargo doc` for Rust.
+
+### Configuration
+
+```typescript
+// vite.config.ts
+import oxContent from 'unplugin-ox-content/vite';
+
+export default defineConfig({
+  plugins: [
+    oxContent({
+      docs: {
+        enabled: true,
+        src: ['./src'],
+        out: 'docs/api',
+      },
+    }),
+  ],
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | `boolean` | `false` | Enable API docs generation |
+| `src` | `string[]` | `['./src']` | Source directories to scan |
+| `out` | `string` | `'docs/api'` | Output directory |
+| `include` | `string[]` | `['**/*.ts', ...]` | File patterns to include |
+| `exclude` | `string[]` | `['**/*.test.*', ...]` | File patterns to exclude |
+| `includePrivate` | `boolean` | `false` | Include private items (`_` prefixed) |
+| `toc` | `boolean` | `true` | Generate table of contents |
+| `groupBy` | `'file' \| 'kind'` | `'file'` | How to group documentation |
+
+### Writing Documentation
+
+Use JSDoc comments to document your code:
+
+```typescript
+/**
+ * A user in the system.
+ */
+export interface User {
+  /** The user's unique identifier */
+  id: string;
+  /** The user's display name */
+  name: string;
+  /** The user's email address */
+  email: string;
+}
+
+/**
+ * Creates a new user.
+ * @param name - The user's name
+ * @param email - The user's email
+ * @returns The created user object
+ * @example
+ * const user = createUser('Alice', 'alice@example.com');
+ */
+export function createUser(name: string, email: string): User {
+  return { id: crypto.randomUUID(), name, email };
+}
+```
+
+Supported JSDoc tags:
+- `@param` - Parameter description
+- `@returns` / `@return` - Return value description
+- `@example` - Usage examples
+- `@deprecated` - Mark as deprecated
+- `@see` - Reference to related items
 
 ## Next Steps
 

@@ -20,14 +20,20 @@ export default defineConfig({
       outDir: 'dist/docs',
       base: '/ox-content/',
 
+      // SSG options
+      ssg: {
+        siteName: 'Ox Content',
+        ogImage: 'https://ubugeeei.github.io/ox-content/og-image.png',
+      },
+
       // Enable syntax highlighting with Shiki
       highlight: true,
       highlightTheme: 'vitesse-dark',
 
-      // Enable mermaid diagrams
-      mermaid: true,
+      // Mermaid diagrams disabled (using SVG instead)
+      mermaid: false,
 
-      // Auto-generate API docs from source
+      // API documentation generation (like cargo doc)
       docs: {
         enabled: true,
         src: ['../packages/vite-plugin-ox-content/src'],
@@ -36,14 +42,8 @@ export default defineConfig({
         exclude: ['**/*.test.*'],
         toc: true,
         groupBy: 'file',
-      },
-
-      // OG Image generation
-      ogImage: true,
-      ogImageOptions: {
-        background: '#1a1a2e',
-        textColor: '#ffffff',
-        accentColor: '#bd34fe',
+        githubUrl: 'https://github.com/ubugeeei/ox-content',
+        generateNav: true,
       },
     }),
   ],
