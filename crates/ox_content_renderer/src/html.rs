@@ -537,4 +537,25 @@ mod tests {
         assert!(html.contains("<input type=\"checkbox\" checked disabled> <p>task 1</p>"));
         assert!(html.contains("<input type=\"checkbox\" disabled> <p>task 2</p>"));
     }
+
+    #[test]
+    fn test_render_image() {
+        let allocator = Allocator::new();
+        let doc = Parser::new(&allocator, "![Alt text](/path/to/image.png)").parse().unwrap();
+        let mut renderer = HtmlRenderer::new();
+        let html = renderer.render(&doc);
+        assert!(html.contains("<img src=\"/path/to/image.png\" alt=\"Alt text\">"));
+    }
+
+    #[test]
+    fn test_render_image_xhtml() {
+        let allocator = Allocator::new();
+        let doc = Parser::new(&allocator, "![Logo](/logo.svg)").parse().unwrap();
+        let mut renderer = HtmlRenderer::with_options(HtmlRendererOptions {
+            xhtml: true,
+            ..Default::default()
+        });
+        let html = renderer.render(&doc);
+        assert!(html.contains("<img src=\"/logo.svg\" alt=\"Logo\" />"));
+    }
 }

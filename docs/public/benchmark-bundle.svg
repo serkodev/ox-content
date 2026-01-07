@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250">
   <defs>
     <linearGradient id="oxGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#ff6b35"/>
@@ -29,51 +29,42 @@
   <!-- Title -->
   <text x="300" y="24" text-anchor="middle" class="title">Build Output Size (Gzipped)</text>
 
-  <!-- Scale: 721.8 KB = 400px max, but we'll cap at 100KB for better viz -->
-  <!-- Using log-ish scale for better visualization -->
-
   <!-- ox-content (bare): 2.8 KB -->
   <text x="140" y="58" text-anchor="end" class="label">ox-content (bare)</text>
-  <rect x="150" y="45" width="11" height="20" rx="4" fill="url(#oxGrad)"/>
-  <text x="168" y="58" class="value">2.8 KB</text>
-  <text x="210" y="58" class="ratio">1.00x</text>
+  <rect x="150" y="45" width="23" height="20" rx="4" fill="url(#oxGrad)"/>
+  <text x="180" y="58" class="value">2.8 KB</text>
+  <text x="222" y="58" class="ratio">1.00x</text>
 
   <!-- Astro: 3.5 KB -->
   <text x="140" y="88" text-anchor="end" class="label">Astro</text>
-  <rect x="150" y="75" width="14" height="20" rx="4" fill="url(#greenGrad)"/>
-  <text x="171" y="88" class="value">3.5 KB</text>
-  <text x="213" y="88" class="ratio">1.26x</text>
+  <rect x="150" y="75" width="29" height="20" rx="4" fill="url(#greenGrad)"/>
+  <text x="186" y="88" class="value">3.5 KB</text>
+  <text x="228" y="88" class="ratio">1.26x</text>
 
   <!-- ox-content (default): 13.0 KB -->
   <text x="140" y="118" text-anchor="end" class="label">ox-content (default)</text>
-  <rect x="150" y="105" width="52" height="20" rx="4" fill="url(#oxGrad2)"/>
-  <text x="209" y="118" class="value">13.0 KB</text>
-  <text x="260" y="118" class="ratio">4.59x</text>
+  <rect x="150" y="105" width="107" height="20" rx="4" fill="url(#oxGrad2)"/>
+  <text x="264" y="118" class="value">13.0 KB</text>
+  <text x="315" y="118" class="ratio">4.59x</text>
 
   <!-- Astro + Vue: 33.2 KB -->
   <text x="140" y="148" text-anchor="end" class="label">Astro + Vue</text>
-  <rect x="150" y="135" width="132" height="20" rx="4" fill="url(#greenGrad)"/>
-  <text x="289" y="148" class="value">33.2 KB</text>
-  <text x="340" y="148" class="ratio">11.75x</text>
+  <rect x="150" y="135" width="274" height="20" rx="4" fill="url(#greenGrad)"/>
+  <text x="431" y="148" class="value">33.2 KB</text>
+  <text x="482" y="148" class="ratio">11.75x</text>
 
   <!-- ox-content + Vue: 35.7 KB -->
   <text x="140" y="178" text-anchor="end" class="label">ox-content + Vue</text>
-  <rect x="150" y="165" width="143" height="20" rx="4" fill="url(#oxGrad2)"/>
-  <text x="300" y="178" class="value">35.7 KB</text>
-  <text x="351" y="178" class="ratio">12.66x</text>
+  <rect x="150" y="165" width="294" height="20" rx="4" fill="url(#oxGrad2)"/>
+  <text x="451" y="178" class="value">35.7 KB</text>
+  <text x="502" y="178" class="ratio">12.66x</text>
 
-  <!-- VitePress (bare): 48.8 KB -->
-  <text x="140" y="208" text-anchor="end" class="label">VitePress (bare)</text>
-  <rect x="150" y="195" width="195" height="20" rx="4" fill="url(#grayGrad)"/>
-  <text x="352" y="208" class="value">48.8 KB</text>
-  <text x="403" y="208" class="ratio">17.28x</text>
-
-  <!-- VitePress (default): 721.8 KB - capped visually -->
-  <text x="140" y="238" text-anchor="end" class="label">VitePress (default)</text>
-  <rect x="150" y="225" width="400" height="20" rx="4" fill="url(#grayGrad)"/>
-  <text x="557" y="238" class="value">721.8 KB</text>
-  <text x="405" y="238" class="ratio" fill="#fff">255.66x</text>
+  <!-- VitePress: 48.8 KB (bare, no theme) -->
+  <text x="140" y="208" text-anchor="end" class="label">VitePress</text>
+  <rect x="150" y="195" width="400" height="20" rx="4" fill="url(#grayGrad)"/>
+  <text x="557" y="208" class="value">48.8 KB</text>
+  <text x="420" y="208" class="ratio" fill="#fff">17.28x</text>
 
   <!-- Footer -->
-  <text x="300" y="268" text-anchor="middle" class="unit">Lower is better. Same 4 Markdown pages across all frameworks.</text>
+  <text x="300" y="238" text-anchor="middle" class="unit">Lower is better. Same 4 Markdown pages across all frameworks.</text>
 </svg>

@@ -2,8 +2,8 @@
 
 use ox_content_allocator::{Allocator, Vec};
 use ox_content_ast::{
-    AlignKind, Document, Link, List, ListItem, Node, Paragraph, Span, Table, TableCell, TableRow,
-    Text,
+    AlignKind, Document, Image, Link, List, ListItem, Node, Paragraph, Span, Table, TableCell,
+    TableRow, Text,
 };
 
 use crate::error::{ParseError, ParseResult};
@@ -983,6 +983,95 @@ impl<'a> Parser<'a> {
                         pos = link_start + 1;
                     }
                 }
+                b'!' => {
+                    // Image: ![alt](url)
+                    if pos + 1 < content.len() && bytes[pos + 1] == b'[' {
+                        let image_start = pos;
+                        pos += 2; // skip ![
+                        let alt_start = pos;
+
+                        // Find closing ]
+                        let mut bracket_depth = 1;
+                        while pos < content.len() && bracket_depth > 0 {
+                            match bytes[pos] {
+                                b'[' => bracket_depth += 1,
+                                b']' => bracket_depth -= 1,
+                                _ => {}
+                            }
+                            if bracket_depth > 0 {
+                                pos += 1;
+                            }
+                        }
+
+                        if pos < content.len()
+                            && bytes[pos] == b']'
+                            && pos + 1 < content.len()
+                            && bytes[pos + 1] == b'('
+                        {
+                            let alt_text = &content[alt_start..pos];
+                            pos += 2; // skip ](
+
+                            // Find closing )
+                            let url_start = pos;
+                            let mut paren_depth = 1;
+                            while pos < content.len() && paren_depth > 0 {
+                                match bytes[pos] {
+                                    b'(' => paren_depth += 1,
+                                    b')' => paren_depth -= 1,
+                                    _ => {}
+                                }
+                                if paren_depth > 0 {
+                                    pos += 1;
+                                }
+                            }
+
+                            if pos < content.len() && bytes[pos] == b')' {
+                                let url = &content[url_start..pos];
+                                pos += 1; // skip )
+
+                                let image = Image {
+                                    url: self.allocator.alloc_str(url),
+                                    alt: self.allocator.alloc_str(alt_text),
+                                    title: None,
+                                    span: Span::new(
+                                        (offset + image_start) as u32,
+                                        (offset + pos) as u32,
+                                    ),
+                                };
+                                children.push(Node::Image(image));
+                            } else {
+                                // Invalid image, treat as text
+                                let text = Text {
+                                    value: self.allocator.alloc_str(&content[image_start..pos]),
+                                    span: Span::new(
+                                        (offset + image_start) as u32,
+                                        (offset + pos) as u32,
+                                    ),
+                                };
+                                children.push(Node::Text(text));
+                            }
+                        } else {
+                            // Not an image, just ![
+                            let text = Text {
+                                value: self.allocator.alloc_str("!["),
+                                span: Span::new(
+                                    (offset + image_start) as u32,
+                                    (offset + image_start + 2) as u32,
+                                ),
+                            };
+                            children.push(Node::Text(text));
+                            pos = image_start + 2;
+                        }
+                    } else {
+                        // Just a !, treat as text
+                        let text = Text {
+                            value: self.allocator.alloc_str("!"),
+                            span: Span::new((offset + pos) as u32, (offset + pos + 1) as u32),
+                        };
+                        children.push(Node::Text(text));
+                        pos += 1;
+                    }
+                }
                 _ => {
                     // Other special characters
                     let text = Text {
@@ -1002,6 +1091,26 @@ impl<'a> Parser<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_image() {
+        let allocator = Allocator::new();
+        let doc = Parser::new(&allocator, "![Alt text](/path/to/image.png)").parse().unwrap();
+        assert_eq!(doc.children.len(), 1);
+        match &doc.children[0] {
+            Node::Paragraph(p) => {
+                assert_eq!(p.children.len(), 1);
+                match &p.children[0] {
+                    Node::Image(img) => {
+                        assert_eq!(img.alt, "Alt text");
+                        assert_eq!(img.url, "/path/to/image.png");
+                    }
+                    _ => panic!("expected image, got {:?}", &p.children[0]),
+                }
+            }
+            _ => panic!("expected paragraph"),
+        }
+    }
 
     #[test]
     fn test_parse_heading() {
