@@ -23,6 +23,7 @@ export default defineConfig({
       // SSG options with per-page OG image generation (uses Rust)
       ssg: {
         siteName: 'Ox Content',
+        siteUrl: 'https://ubugeeei.github.io', // Required for absolute OG image URLs
         ogImage: 'https://ubugeeei.github.io/ox-content/og-image.svg', // fallback
         generateOgImage: true, // Enable per-page OG image generation via Rust
       },

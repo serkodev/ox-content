@@ -386,6 +386,7 @@ export function resolveSsgOptions(ssg: SsgOptions | boolean | undefined): Resolv
     siteName: ssg.siteName,
     ogImage: ssg.ogImage,
     generateOgImage: ssg.generateOgImage ?? false,
+    siteUrl: ssg.siteUrl,
   };
 }
 
@@ -572,13 +573,24 @@ function getOgImagePath(inputPath: string, srcDir: string, outDir: string): stri
 
 /**
  * Gets the OG image URL for use in meta tags.
+ * If siteUrl is provided, returns an absolute URL (required for SNS sharing).
  */
-function getOgImageUrl(inputPath: string, srcDir: string, base: string): string {
+function getOgImageUrl(inputPath: string, srcDir: string, base: string, siteUrl?: string): string {
   const urlPath = getUrlPath(inputPath, srcDir);
+  let relativePath: string;
   if (urlPath === '/' || urlPath === '') {
-    return `${base}og-image.svg`;
+    relativePath = `${base}og-image.svg`;
+  } else {
+    relativePath = `${base}${urlPath}/og-image.svg`;
   }
-  return `${base}${urlPath}/og-image.svg`;
+
+  // Return absolute URL if siteUrl is provided
+  if (siteUrl) {
+    const cleanSiteUrl = siteUrl.replace(/\/$/, '');
+    return `${cleanSiteUrl}${relativePath}`;
+  }
+
+  return relativePath;
 }
 
 /**
@@ -778,8 +790,8 @@ export async function buildSsg(
           await fs.writeFile(ogImageOutputPath, svg, 'utf-8');
           generatedFiles.push(ogImageOutputPath);
 
-          // Use per-page OG image URL
-          pageOgImage = getOgImageUrl(inputPath, srcDir, base);
+          // Use per-page OG image URL (absolute if siteUrl is provided)
+          pageOgImage = getOgImageUrl(inputPath, srcDir, base, ssgOptions.siteUrl);
         }
       }
 

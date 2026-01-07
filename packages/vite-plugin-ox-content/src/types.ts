@@ -48,6 +48,13 @@ export interface SsgOptions {
    * @default false
    */
   generateOgImage?: boolean;
+
+  /**
+   * Site URL for generating absolute OG image URLs.
+   * Required for proper SNS sharing.
+   * Example: 'https://example.com'
+   */
+  siteUrl?: string;
 }
 
 /**
@@ -61,6 +68,7 @@ export interface ResolvedSsgOptions {
   siteName?: string;
   ogImage?: string;
   generateOgImage: boolean;
+  siteUrl?: string;
 }
 
 /**
