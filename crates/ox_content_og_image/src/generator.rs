@@ -101,23 +101,19 @@ impl OgImageGenerator {
         let site_name = data
             .site_name
             .as_ref()
-            .map(|s| escape_xml(s))
-            .unwrap_or_else(|| "Ox Content".to_string());
+            .map_or_else(|| "Ox Content".to_string(), |s| escape_xml(s));
 
         // Generate description lines (wrap at ~60 chars)
         let desc_lines = wrap_text(&description, 60);
-        let desc_svg: String = desc_lines
-            .iter()
-            .enumerate()
-            .map(|(i, line)| {
-                format!(
-                    r#"<tspan x="80" dy="{}">{}</tspan>"#,
-                    if i == 0 { "0" } else { "1.4em" },
-                    line
-                )
-            })
-            .collect::<Vec<_>>()
-            .join("");
+        let desc_svg = desc_lines.iter().enumerate().fold(
+            String::new(),
+            |mut acc, (i, line)| {
+                use std::fmt::Write;
+                let dy = if i == 0 { "0" } else { "1.4em" };
+                let _ = write!(acc, r#"<tspan x="80" dy="{dy}">{line}</tspan>"#);
+                acc
+            },
+        );
 
         format!(
             r#"<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
@@ -164,7 +160,7 @@ fn truncate_text(text: &str, max_len: usize) -> String {
         text.to_string()
     } else {
         let truncated: String = text.chars().take(max_len - 3).collect();
-        format!("{}...", truncated)
+        format!("{truncated}...")
     }
 }
 
