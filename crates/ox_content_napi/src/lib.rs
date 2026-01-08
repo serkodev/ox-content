@@ -707,25 +707,16 @@ pub fn extract_search_content(
     let parser = Parser::with_options(&allocator, &content, parser_options);
 
     let result = parser.parse();
-    let (title, body, headings, code) = match result {
-        Ok(ref doc) => {
-            let mut indexer = DocumentIndexer::new();
-            indexer.extract(doc);
+    let (title, body, headings, code) = if let Ok(ref doc) = result {
+        let mut indexer = DocumentIndexer::new();
+        indexer.extract(doc);
 
-            let title = frontmatter_title
-                .clone()
-                .unwrap_or_else(|| indexer.title().map(String::from).unwrap_or_default());
+        let title = frontmatter_title
+            .unwrap_or_else(|| indexer.title().map(String::from).unwrap_or_default());
 
-            (
-                title,
-                indexer.body().to_string(),
-                indexer.headings().to_vec(),
-                indexer.code().to_vec(),
-            )
-        }
-        Err(_) => {
-            (frontmatter_title.clone().unwrap_or_default(), String::new(), Vec::new(), Vec::new())
-        }
+        (title, indexer.body().to_string(), indexer.headings().to_vec(), indexer.code().to_vec())
+    } else {
+        (frontmatter_title.unwrap_or_default(), String::new(), Vec::new(), Vec::new())
     };
     // Explicitly drop the result to release the borrow
     drop(result);

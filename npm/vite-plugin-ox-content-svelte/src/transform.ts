@@ -67,6 +67,7 @@ export async function transformMarkdownWithSvelte(
     ogImageOptions: {},
     transformers: [],
     docs: false,
+    search: { enabled: false, limit: 10, prefix: true, placeholder: 'Search...', hotkey: 'k' },
   });
 
   const svelteCode = generateSvelteModule(

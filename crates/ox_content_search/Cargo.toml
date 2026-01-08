@@ -21,3 +21,5 @@ serde_json = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }
+ox_content_allocator = { workspace = true }
+ox_content_parser = { workspace = true }

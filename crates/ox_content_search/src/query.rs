@@ -95,7 +95,7 @@ impl SearchIndex {
                         // BM25 score with field boost
                         let score = idf
                             * ((tf * (K1 + 1.0))
-                                / (tf + K1 * (1.0 - B + B * doc_len / self.avg_dl)))
+                                / K1.mul_add(1.0 - B + B * doc_len / self.avg_dl, tf))
                             * posting.field.boost();
 
                         let entry = doc_scores.entry(posting.doc_idx).or_insert((0.0, Vec::new()));
@@ -147,16 +147,15 @@ impl SearchIndex {
     fn find_matching_terms(&self, token: &str, prefix_match: bool) -> Vec<String> {
         if prefix_match && token.len() >= 2 {
             self.index.keys().filter(|term| term.starts_with(token)).cloned().collect()
+        } else if self.index.contains_key(token) {
+            vec![token.to_string()]
         } else {
-            if self.index.contains_key(token) {
-                vec![token.to_string()]
-            } else {
-                Vec::new()
-            }
+            Vec::new()
         }
     }
 
     /// Generates a snippet of text around matched terms.
+    #[allow(clippy::unused_self)]
     fn generate_snippet(&self, body: &str, matches: &[String], max_len: usize) -> String {
         if body.is_empty() {
             return String::new();

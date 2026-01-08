@@ -90,6 +90,7 @@ export async function transformMarkdownWithVue(
     ogImageOptions: {},
     transformers: [],
     docs: false,
+    search: { enabled: false, limit: 10, prefix: true, placeholder: 'Search...', hotkey: 'k' },
   });
 
   // Generate Vue SFC code

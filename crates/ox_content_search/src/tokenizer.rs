@@ -10,9 +10,8 @@
 pub fn tokenize(text: &str) -> Vec<String> {
     let mut tokens = Vec::new();
     let mut current_token = String::new();
-    let mut chars = text.chars().peekable();
 
-    while let Some(c) = chars.next() {
+    for c in text.chars() {
         if is_cjk_char(c) {
             // CJK characters are treated as individual tokens
             if !current_token.is_empty() {
