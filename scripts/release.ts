@@ -1,9 +1,9 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * Release script for ox-content
  *
  * Usage:
- *   npx tsx scripts/release.ts [patch|minor|major|x.y.z]
+ *   bun scripts/release.ts [patch|minor|major|x.y.z]
  *
  * This script:
  *   1. Updates all package.json versions
@@ -16,7 +16,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(import.meta.dir, '..');
 
 // Packages to publish (relative to root)
 const PACKAGES = [
@@ -162,7 +162,7 @@ async function main(): Promise<void> {
   const input = args[0];
 
   if (!input) {
-    console.error('Usage: npx tsx scripts/release.ts [patch|minor|major|x.y.z]');
+    console.error('Usage: bun scripts/release.ts [patch|minor|major|x.y.z]');
     process.exit(1);
   }
 

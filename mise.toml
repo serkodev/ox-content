@@ -1,6 +1,7 @@
 [tools]
 rust = "1.92"
 node = "22"
+bun = "latest"
 
 [env]
 RUST_BACKTRACE = "1"
@@ -178,7 +179,7 @@ run = "pnpm install"
 
 [tasks.release]
 description = "Release a new version (usage: mise run release -- patch|minor|major|x.y.z)"
-run = "npx tsx scripts/release.ts"
+run = "bun scripts/release.ts"
 
 [tasks.examples-install]
 description = "Install all example dependencies"
