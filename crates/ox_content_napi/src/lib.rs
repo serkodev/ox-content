@@ -712,9 +712,9 @@ pub fn extract_search_content(
             let mut indexer = DocumentIndexer::new();
             indexer.extract(doc);
 
-            let title = frontmatter_title.clone().unwrap_or_else(|| {
-                indexer.title().map(String::from).unwrap_or_default()
-            });
+            let title = frontmatter_title
+                .clone()
+                .unwrap_or_else(|| indexer.title().map(String::from).unwrap_or_default());
 
             (
                 title,
@@ -723,12 +723,9 @@ pub fn extract_search_content(
                 indexer.code().to_vec(),
             )
         }
-        Err(_) => (
-            frontmatter_title.clone().unwrap_or_default(),
-            String::new(),
-            Vec::new(),
-            Vec::new(),
-        ),
+        Err(_) => {
+            (frontmatter_title.clone().unwrap_or_default(), String::new(), Vec::new(), Vec::new())
+        }
     };
     // Explicitly drop the result to release the borrow
     drop(result);

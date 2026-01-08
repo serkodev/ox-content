@@ -209,7 +209,12 @@ mod tests {
     #[test]
     fn test_build_index() {
         let mut builder = SearchIndexBuilder::new();
-        builder.add_simple("1", "Getting Started", "/getting-started", "Welcome to the documentation");
+        builder.add_simple(
+            "1",
+            "Getting Started",
+            "/getting-started",
+            "Welcome to the documentation",
+        );
         builder.add_simple("2", "Installation", "/installation", "How to install the package");
 
         let index = builder.build();

@@ -146,11 +146,7 @@ impl SearchIndex {
     /// Finds terms matching the query term (exact or prefix).
     fn find_matching_terms(&self, token: &str, prefix_match: bool) -> Vec<String> {
         if prefix_match && token.len() >= 2 {
-            self.index
-                .keys()
-                .filter(|term| term.starts_with(token))
-                .cloned()
-                .collect()
+            self.index.keys().filter(|term| term.starts_with(token)).cloned().collect()
         } else {
             if self.index.contains_key(token) {
                 vec![token.to_string()]
@@ -278,7 +274,12 @@ mod tests {
     fn test_search_limit() {
         let mut builder = SearchIndexBuilder::new();
         for i in 0..20 {
-            builder.add_simple(&format!("{i}"), &format!("Test {i}"), &format!("/test-{i}"), "test content");
+            builder.add_simple(
+                &format!("{i}"),
+                &format!("Test {i}"),
+                &format!("/test-{i}"),
+                "test content",
+            );
         }
 
         let index = builder.build();
