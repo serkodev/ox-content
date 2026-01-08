@@ -213,9 +213,11 @@ The async API (`parseAndRenderAsync`, `transformAsync`) runs on a worker thread,
 | `ox_content_parser` | Markdown parser | CommonMark + GFM, streaming support |
 | `ox_content_renderer` | HTML renderer | Customizable, XHTML support, sanitization |
 | `ox_content_search` | Full-text search | BM25 scoring, CJK support, prefix matching |
+| `ox_content_ssg` | Static site generation | HTML templates, navigation, theming |
 | `ox_content_napi` | Node.js bindings | napi-rs, TypeScript types |
 | `ox_content_wasm` | WebAssembly bindings | wasm-bindgen, Browser & Deno support |
 | `ox_content_og_image` | OG images | SVG-based, customizable templates |
+| `ox_content_docs` | API docs generator | JSDoc/TypeScript extraction (like cargo doc) |
 
 ### Unplugin
 

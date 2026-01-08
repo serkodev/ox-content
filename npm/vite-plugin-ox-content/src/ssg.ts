@@ -1113,12 +1113,35 @@ function buildNavItems(
       groups.set(groupKey, []);
     }
 
+    const urlPath = getUrlPath(file, srcDir);
+
+    // Use "Overview" for root index.md, otherwise use getDisplayTitle
+    let title: string;
+    if (urlPath === '/' || urlPath === '') {
+      title = 'Overview';
+    } else {
+      title = getDisplayTitle(file);
+    }
+
     groups.get(groupKey)!.push({
-      title: getDisplayTitle(file),
-      path: getUrlPath(file, srcDir),
+      title,
+      path: urlPath,
       href: getHref(file, srcDir, base, extension),
     });
   }
+
+  // Sort items within each group: index files first, then alphabetically
+  const sortItems = (items: SsgNavItem[]) => {
+    return items.sort((a, b) => {
+      // Root index (Overview) comes first
+      const aIsRoot = a.path === '/' || a.path === '';
+      const bIsRoot = b.path === '/' || b.path === '';
+      if (aIsRoot && !bIsRoot) return -1;
+      if (!aIsRoot && bIsRoot) return 1;
+      // Otherwise, maintain alphabetical order by title
+      return a.title.localeCompare(b.title);
+    });
+  };
 
   // Convert to array and sort by group order
   const result: NavGroup[] = [];
@@ -1128,7 +1151,7 @@ function buildNavItems(
     if (items && items.length > 0) {
       result.push({
         title: key === '' ? 'Guide' : formatTitle(key),
-        items,
+        items: sortItems(items),
       });
       groups.delete(key);
     }
@@ -1139,7 +1162,7 @@ function buildNavItems(
     if (items.length > 0) {
       result.push({
         title: formatTitle(key),
-        items,
+        items: sortItems(items),
       });
     }
   }

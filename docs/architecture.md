@@ -17,7 +17,10 @@ ox-content/
 │   ├── ox_content_ast/         # Core: AST definitions
 │   ├── ox_content_parser/      # Core: Markdown parser
 │   ├── ox_content_renderer/    # Core: HTML renderer
+│   ├── ox_content_search/      # Core: Full-text search engine
+│   ├── ox_content_ssg/         # Core: Static site generation
 │   ├── ox_content_napi/        # Bindings: Node.js via napi-rs
+│   ├── ox_content_wasm/        # Bindings: WebAssembly
 │   ├── ox_content_vite/        # Integration: Vite plugin
 │   ├── ox_content_og_image/    # Feature: OG image generation
 │   └── ox_content_docs/        # Feature: Source code documentation
