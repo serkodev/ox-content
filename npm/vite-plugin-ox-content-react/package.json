@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-ox-content-react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React integration for Ox Content - Embed React components in Markdown",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,7 +11,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -36,6 +38,13 @@
     "typescript": "catalog:",
     "vite": "catalog:"
   },
-  "keywords": ["vite", "vite-plugin", "react", "markdown", "ox-content", "mdx"],
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "react",
+    "markdown",
+    "ox-content",
+    "mdx"
+  ],
   "license": "MIT"
 }

@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-ox-content-svelte",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Svelte integration for Ox Content - Embed Svelte components in Markdown",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,7 +11,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -32,6 +34,12 @@
     "typescript": "catalog:",
     "vite": "catalog:"
   },
-  "keywords": ["vite", "vite-plugin", "svelte", "markdown", "ox-content"],
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "svelte",
+    "markdown",
+    "ox-content"
+  ],
   "license": "MIT"
 }
