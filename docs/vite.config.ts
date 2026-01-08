@@ -1,24 +1,25 @@
 import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
 import { oxContent } from 'vite-plugin-ox-content';
 
 /**
  * Ox Content Documentation Site
  *
  * Dogfooding: Using ox-content to build ox-content's own documentation.
- * Uses the base oxContent plugin which transforms .md to JavaScript modules.
+ * Uses SSG to generate static HTML from Markdown files.
  */
-export default defineConfig({
-  // Site base path (for GitHub Pages)
-  base: '/ox-content/',
+export default defineConfig(({ mode }) => {
+  const isProd = mode === 'production';
+  const base = isProd ? '/ox-content/' : '/';
 
-  plugins: [
-    vue(),
+  return {
+    // Site base path (for GitHub Pages in prod, root for dev)
+    base,
 
-    oxContent({
-      srcDir: '.',
-      outDir: 'dist/docs',
-      base: '/ox-content/',
+    plugins: [
+      oxContent({
+        srcDir: '.',
+        outDir: 'dist/docs',
+        base,
 
       // SSG options
       ssg: {
@@ -36,7 +37,7 @@ export default defineConfig({
       // API documentation generation (like cargo doc)
       docs: {
         enabled: true,
-        src: ['../packages/vite-plugin-ox-content/src'],
+        src: ['../npm/vite-plugin-ox-content/src'],
         out: 'api',
         include: ['**/*.ts'],
         exclude: ['**/*.test.*'],
@@ -46,9 +47,10 @@ export default defineConfig({
         generateNav: true,
       },
     }),
-  ],
+    ],
 
-  build: {
-    outDir: 'dist/docs',
-  },
+    build: {
+      outDir: 'dist/docs',
+    },
+  };
 });

@@ -7,7 +7,7 @@ description: High-performance documentation toolkit built in Rust. Framework-agn
 
 **A framework-agnostic documentation tooling for Vite+**
 
-![Ox Content Logo](/ox-content/logo.svg)
+![Ox Content Logo](./logo.svg)
 
 ---
 
@@ -29,7 +29,7 @@ Ox Content leverages the [Oxc](https://oxc.rs/) philosophy:
 - **Native performance** - Rust core with NAPI bindings
 - **Minimal output** - SSG-first approach, ship only what you need
 
-![Architecture](/ox-content/architecture.svg)
+![Architecture](./architecture.svg)
 
 ## Core Philosophy
 
@@ -106,6 +106,36 @@ Here is a footnote[^1].
 [^1]: Footnote content.
 ```
 
+### Built-in Full-text Search
+
+Ox Content includes a high-performance full-text search engine written in Rust:
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import { oxContent } from 'vite-plugin-ox-content';
+
+export default defineConfig({
+  plugins: [
+    oxContent({
+      search: {
+        enabled: true,
+        limit: 10,
+        placeholder: 'Search documentation...',
+      },
+    })
+  ]
+});
+```
+
+**Features:**
+- **BM25 Scoring** - Industry-standard relevance ranking
+- **Multi-field Search** - Title, headings, body, and code blocks with weighted scoring
+- **Japanese/CJK Support** - Proper tokenization for Asian languages
+- **Prefix Matching** - Type-ahead suggestions for autocomplete
+- **Keyboard Shortcuts** - Press `/` or `Cmd/Ctrl+K` to open search
+- **Zero Dependencies** - No external search service required
+
 ### Vite Environment API Integration
 
 SSG-focused rendering with Astro-like islands architecture:
@@ -154,19 +184,19 @@ The async API (`parseAndRenderAsync`, `transformAsync`) runs on a worker thread,
 
 ### Parse Speed
 
-![Parse Benchmark](/ox-content/benchmark-parse.svg)
+![Parse Benchmark](./benchmark-parse.svg)
 
 ### Render Speed
 
-![Render Benchmark](/ox-content/benchmark-render.svg)
+![Render Benchmark](./benchmark-render.svg)
 
 ### Build Output Size
 
-![Bundle Size Benchmark](/ox-content/benchmark-bundle.svg)
+![Bundle Size Benchmark](./benchmark-bundle.svg)
 
 ### Production Build Time
 
-![Build Time Benchmark](/ox-content/benchmark-build.svg)
+![Build Time Benchmark](./benchmark-build.svg)
 
 > **Note:** ox-content (bare) produces pure HTML without JavaScript/CSS, ideal for custom themes or benchmarking. VitePress always includes Vue runtime for client-side hydration.
 
@@ -182,9 +212,12 @@ The async API (`parseAndRenderAsync`, `transformAsync`) runs on a worker thread,
 | `ox_content_ast` | AST definitions | mdast-compatible nodes, Visitor pattern |
 | `ox_content_parser` | Markdown parser | CommonMark + GFM, streaming support |
 | `ox_content_renderer` | HTML renderer | Customizable, XHTML support, sanitization |
+| `ox_content_search` | Full-text search | BM25 scoring, CJK support, prefix matching |
+| `ox_content_ssg` | Static site generation | HTML templates, navigation, theming |
 | `ox_content_napi` | Node.js bindings | napi-rs, TypeScript types |
 | `ox_content_wasm` | WebAssembly bindings | wasm-bindgen, Browser & Deno support |
 | `ox_content_og_image` | OG images | SVG-based, customizable templates |
+| `ox_content_docs` | API docs generator | JSDoc/TypeScript extraction (like cargo doc) |
 
 ### Unplugin
 

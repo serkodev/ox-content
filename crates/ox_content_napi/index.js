@@ -55,3 +55,7 @@ module.exports.transform = binding.transform;
 module.exports.transformAsync = binding.transformAsync;
 module.exports.version = binding.version;
 module.exports.generateOgImageSvg = binding.generateOgImageSvg;
+module.exports.buildSearchIndex = binding.buildSearchIndex;
+module.exports.searchIndex = binding.searchIndex;
+module.exports.extractSearchContent = binding.extractSearchContent;
+module.exports.generateSsgHtml = binding.generateSsgHtml;
