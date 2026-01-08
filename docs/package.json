@@ -8,11 +8,7 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "vue": "catalog:"
-  },
   "devDependencies": {
-    "@vitejs/plugin-vue": "catalog:",
     "vite": "catalog:",
     "vite-plugin-ox-content": "workspace:*"
   }

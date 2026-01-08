@@ -140,6 +140,118 @@ export const DEFAULT_HTML_TEMPLATE = `<!DOCTYPE html>
     .menu-toggle svg { display: block; }
     .menu-toggle path { stroke: var(--color-text); }
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+    .search-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--color-bg-alt);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .search-button:hover { border-color: var(--color-primary); color: var(--color-text); }
+    .search-button svg { width: 16px; height: 16px; }
+    .search-button kbd {
+      padding: 0.125rem 0.375rem;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    @media (max-width: 640px) {
+      .search-button span, .search-button kbd { display: none; }
+      .search-button { padding: 0.5rem; }
+    }
+    .search-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      padding-top: 10vh;
+    }
+    .search-modal-overlay.open { display: flex; }
+    .search-modal {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 1rem;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .search-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .search-header svg { flex-shrink: 0; color: var(--color-text-muted); }
+    .search-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      color: var(--color-text);
+    }
+    .search-input::placeholder { color: var(--color-text-muted); }
+    .search-close {
+      padding: 0.25rem 0.5rem;
+      background: var(--color-bg-alt);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .search-results {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+    .search-result {
+      display: block;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: var(--color-text);
+      text-decoration: none;
+    }
+    .search-result:hover, .search-result.selected { background: var(--color-bg-alt); text-decoration: none; }
+    .search-result-title { font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem; }
+    .search-result-snippet { font-size: 0.8125rem; color: var(--color-text-muted); }
+    .search-empty { padding: 2rem 1rem; text-align: center; color: var(--color-text-muted); }
+    .search-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-alt);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+    .search-footer kbd {
+      padding: 0.125rem 0.375rem;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
     .theme-toggle {
       background: none;
       border: none;
@@ -377,6 +489,13 @@ export const DEFAULT_HTML_TEMPLATE = `<!DOCTYPE html>
       {{siteName}}
     </a>
     <div class="header-actions">
+      <button class="search-button" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <span>Search</span>
+        <kbd>/</kbd>
+      </button>
       <button class="theme-toggle" aria-label="Toggle theme">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
@@ -387,6 +506,23 @@ export const DEFAULT_HTML_TEMPLATE = `<!DOCTYPE html>
       </button>
     </div>
   </header>
+  <div class="search-modal-overlay">
+    <div class="search-modal">
+      <div class="search-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search documentation..." />
+        <button class="search-close">Esc</button>
+      </div>
+      <div class="search-results"></div>
+      <div class="search-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+        <span><kbd>Enter</kbd> to select</span>
+        <span><kbd>Esc</kbd> to close</span>
+      </div>
+    </div>
+  </div>
   <div class="overlay"></div>
   <div class="layout">
     <aside class="sidebar">
@@ -442,6 +578,189 @@ export const DEFAULT_HTML_TEMPLATE = `<!DOCTYPE html>
         setTheme(current === 'dark' ? 'light' : 'dark');
       });
     }
+
+    // Search functionality
+    const searchButton = document.querySelector('.search-button');
+    const searchOverlay = document.querySelector('.search-modal-overlay');
+    const searchInput = document.querySelector('.search-input');
+    const searchResults = document.querySelector('.search-results');
+    const searchClose = document.querySelector('.search-close');
+    let searchIndex = null;
+    let selectedIndex = 0;
+    let results = [];
+
+    const openSearch = () => {
+      searchOverlay.classList.add('open');
+      searchInput.focus();
+    };
+    const closeSearch = () => {
+      searchOverlay.classList.remove('open');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+      selectedIndex = 0;
+      results = [];
+    };
+
+    // Load search index
+    const loadSearchIndex = async () => {
+      if (searchIndex) return;
+      try {
+        const res = await fetch('{{base}}search-index.json');
+        searchIndex = await res.json();
+      } catch (e) {
+        console.warn('Failed to load search index:', e);
+      }
+    };
+
+    // Tokenize query
+    const tokenize = (text) => {
+      const tokens = [];
+      let current = '';
+      for (const char of text) {
+        const isCjk = /[\\u4E00-\\u9FFF\\u3400-\\u4DBF\\u3040-\\u309F\\u30A0-\\u30FF\\uAC00-\\uD7AF]/.test(char);
+        if (isCjk) {
+          if (current) { tokens.push(current.toLowerCase()); current = ''; }
+          tokens.push(char);
+        } else if (/[a-zA-Z0-9_]/.test(char)) {
+          current += char;
+        } else if (current) {
+          tokens.push(current.toLowerCase());
+          current = '';
+        }
+      }
+      if (current) tokens.push(current.toLowerCase());
+      return tokens;
+    };
+
+    // Perform search
+    const performSearch = async (query) => {
+      if (!query.trim()) {
+        searchResults.innerHTML = '';
+        results = [];
+        return;
+      }
+      await loadSearchIndex();
+      if (!searchIndex) {
+        searchResults.innerHTML = '<div class="search-empty">Search index not available</div>';
+        return;
+      }
+
+      const tokens = tokenize(query);
+      if (!tokens.length) {
+        searchResults.innerHTML = '';
+        results = [];
+        return;
+      }
+
+      const k1 = 1.2, b = 0.75;
+      const docScores = new Map();
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const isLast = i === tokens.length - 1;
+        let matchingTerms = [];
+        if (isLast && token.length >= 2) {
+          matchingTerms = Object.keys(searchIndex.index).filter(t => t.startsWith(token));
+        } else if (searchIndex.index[token]) {
+          matchingTerms = [token];
+        }
+
+        for (const term of matchingTerms) {
+          const postings = searchIndex.index[term] || [];
+          const df = searchIndex.df[term] || 1;
+          const idf = Math.log((searchIndex.doc_count - df + 0.5) / (df + 0.5) + 1.0);
+
+          for (const posting of postings) {
+            const doc = searchIndex.documents[posting.doc_idx];
+            if (!doc) continue;
+            const boost = posting.field === 'Title' ? 10 : posting.field === 'Heading' ? 5 : 1;
+            const tf = posting.tf;
+            const docLen = doc.body.length;
+            const score = idf * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + b * docLen / searchIndex.avg_dl))) * boost;
+
+            if (!docScores.has(posting.doc_idx)) {
+              docScores.set(posting.doc_idx, { score: 0, matches: new Set() });
+            }
+            const entry = docScores.get(posting.doc_idx);
+            entry.score += score;
+            entry.matches.add(term);
+          }
+        }
+      }
+
+      results = Array.from(docScores.entries())
+        .map(([docIdx, data]) => {
+          const doc = searchIndex.documents[docIdx];
+          let snippet = '';
+          if (doc.body) {
+            const bodyLower = doc.body.toLowerCase();
+            let firstPos = -1;
+            for (const match of data.matches) {
+              const pos = bodyLower.indexOf(match);
+              if (pos !== -1 && (firstPos === -1 || pos < firstPos)) firstPos = pos;
+            }
+            const start = Math.max(0, firstPos - 50);
+            const end = Math.min(doc.body.length, start + 150);
+            snippet = doc.body.slice(start, end);
+            if (start > 0) snippet = '...' + snippet;
+            if (end < doc.body.length) snippet += '...';
+          }
+          return { ...doc, score: data.score, snippet };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+
+      selectedIndex = 0;
+      renderResults();
+    };
+
+    const renderResults = () => {
+      if (!results.length) {
+        searchResults.innerHTML = '<div class="search-empty">No results found</div>';
+        return;
+      }
+      searchResults.innerHTML = results.map((r, i) =>
+        '<a href="' + r.url + '" class="search-result' + (i === selectedIndex ? ' selected' : '') + '">' +
+        '<div class="search-result-title">' + r.title + '</div>' +
+        (r.snippet ? '<div class="search-result-snippet">' + r.snippet + '</div>' : '') +
+        '</a>'
+      ).join('');
+    };
+
+    // Event listeners
+    if (searchButton) searchButton.addEventListener('click', openSearch);
+    if (searchClose) searchClose.addEventListener('click', closeSearch);
+    if (searchOverlay) searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
+
+    let searchTimeout = null;
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => performSearch(searchInput.value), 150);
+      });
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSearch();
+        else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (selectedIndex < results.length - 1) { selectedIndex++; renderResults(); }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (selectedIndex > 0) { selectedIndex--; renderResults(); }
+        } else if (e.key === 'Enter' && results[selectedIndex]) {
+          e.preventDefault();
+          window.location.href = results[selectedIndex].url;
+        }
+      });
+    }
+
+    // Global keyboard shortcut (/ or Cmd+K)
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === '/' && !(e.target instanceof HTMLInputElement)) ||
+          ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+        e.preventDefault();
+        openSearch();
+      }
+    });
   </script>
 </body>
 </html>`;
@@ -593,29 +912,49 @@ export function generateBareHtmlPage(
 }
 
 /**
- * Generates HTML page with navigation.
+ * Generates HTML page with navigation using Rust NAPI bindings.
  */
-export function generateHtmlPage(
+export async function generateHtmlPage(
   pageData: SsgPageData,
   navGroups: NavGroup[],
   siteName: string,
   base: string,
   ogImage?: string
-): string {
-  const navigationHtml = generateNavHtml(navGroups, pageData.path);
-  const tocHtml = generateTocHtml(pageData.toc);
+): Promise<string> {
+  const mod = await import('@ox-content/napi');
 
-  return renderTemplate(DEFAULT_HTML_TEMPLATE, {
-    title: pageData.title,
-    description: pageData.description,
-    siteName,
-    base,
-    ogImage,
-    content: pageData.content,
-    navigation: navigationHtml,
-    toc: tocHtml,
-    hasToc: pageData.toc.length > 0,
-  });
+  // Convert TocEntry to the format expected by Rust
+  const tocForRust = pageData.toc.map((entry) => ({
+    depth: entry.depth,
+    text: entry.text,
+    slug: entry.slug,
+  }));
+
+  // Convert NavGroup to the format expected by Rust
+  const navGroupsForRust = navGroups.map((group) => ({
+    title: group.title,
+    items: group.items.map((item) => ({
+      title: item.title,
+      path: item.path,
+      href: item.href,
+    })),
+  }));
+
+  return mod.generateSsgHtml(
+    {
+      title: pageData.title,
+      description: pageData.description,
+      content: pageData.content,
+      toc: tocForRust,
+      path: pageData.path,
+    },
+    navGroupsForRust,
+    {
+      siteName,
+      base,
+      ogImage,
+    }
+  );
 }
 
 /**
@@ -916,7 +1255,7 @@ export async function buildSsg(
           path: getUrlPath(inputPath, srcDir),
           href: getHref(inputPath, srcDir, base, ssgOptions.extension),
         };
-        html = generateHtmlPage(pageData, navItems, siteName, base, pageOgImage);
+        html = await generateHtmlPage(pageData, navItems, siteName, base, pageOgImage);
       }
 
       // Write output file

@@ -1,12 +1,11 @@
 import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
 import { oxContent } from 'vite-plugin-ox-content';
 
 /**
  * Ox Content Documentation Site
  *
  * Dogfooding: Using ox-content to build ox-content's own documentation.
- * Uses the base oxContent plugin which transforms .md to JavaScript modules.
+ * Uses SSG to generate static HTML from Markdown files.
  */
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
@@ -17,8 +16,6 @@ export default defineConfig(({ mode }) => {
     base,
 
     plugins: [
-      vue(),
-
       oxContent({
         srcDir: '.',
         outDir: 'dist/docs',

@@ -182,6 +182,46 @@ export declare function buildSearchIndex(documents: Array<JsSearchDocument>): st
  * Returns an array of search results.
  */
 export declare function searchIndex(indexJson: string, query: string, options?: JsSearchOptions | undefined | null): Array<JsSearchResult>
+/** Navigation item for SSG. */
+export interface JsSsgNavItem {
+  /** Display title. */
+  title: string
+  /** URL path. */
+  path: string
+  /** Full href. */
+  href: string
+}
+/** Navigation group for SSG. */
+export interface JsSsgNavGroup {
+  /** Group title. */
+  title: string
+  /** Navigation items. */
+  items: Array<JsSsgNavItem>
+}
+/** Page data for SSG. */
+export interface JsSsgPageData {
+  /** Page title. */
+  title: string
+  /** Page description. */
+  description?: string
+  /** Page content HTML. */
+  content: string
+  /** Table of contents entries. */
+  toc: Array<TocEntry>
+  /** URL path. */
+  path: string
+}
+/** SSG configuration. */
+export interface JsSsgConfig {
+  /** Site name. */
+  siteName: string
+  /** Base URL path. */
+  base: string
+  /** OG image URL. */
+  ogImage?: string
+}
+/** Generates SSG HTML page with navigation and search. */
+export declare function generateSsgHtml(pageData: JsSsgPageData, navGroups: Array<JsSsgNavGroup>, config: JsSsgConfig): string
 /**
  * Extracts searchable content from Markdown source.
  *
