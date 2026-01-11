@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0-alpha.2] - 2026-01-11
+
+### Features
+
+- use trusted publishing for crates.io
+
 ## [0.3.0-alpha.1] - 2026-01-11
 
 ## [0.3.0-alpha.0] - 2026-01-11
