@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S node --experimental-strip-types
 /**
  * Release script for ox-content
  *
@@ -15,11 +15,13 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT = path.resolve(import.meta.dir, '..');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
 
 // Packages to publish (relative to root)
-const PACKAGES = [
+const NPM_PACKAGES = [
   'crates/ox_content_napi',
   'npm/unplugin-ox-content',
   'npm/vite-plugin-ox-content',
@@ -27,6 +29,8 @@ const PACKAGES = [
   'npm/vite-plugin-ox-content-svelte',
   'npm/vite-plugin-ox-content-vue',
 ];
+
+const CARGO_TOML = 'Cargo.toml';
 
 function exec(cmd: string, options: { cwd?: string; stdio?: 'inherit' | 'pipe' } = {}): string {
   console.log(`$ ${cmd}`);
@@ -36,9 +40,10 @@ function exec(cmd: string, options: { cwd?: string; stdio?: 'inherit' | 'pipe' }
       encoding: 'utf-8',
       stdio: options.stdio ?? 'pipe',
     });
-  } catch (e: any) {
+  } catch (e) {
     if (options.stdio === 'inherit') throw e;
-    throw new Error(`Command failed: ${cmd}\n${e.stderr || e.stdout || e.message}`);
+    const err = e as { stderr?: string; stdout?: string; message?: string };
+    throw new Error(`Command failed: ${cmd}\n${err.stderr || err.stdout || err.message}`);
   }
 }
 
@@ -53,6 +58,17 @@ function setPackageVersion(pkgPath: string, version: string): void {
   pkg.version = version;
   fs.writeFileSync(fullPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8');
   console.log(`  Updated ${pkg.name} to ${version}`);
+}
+
+function setCargoVersion(version: string): void {
+  const fullPath = path.join(ROOT, CARGO_TOML);
+  let content = fs.readFileSync(fullPath, 'utf-8');
+  content = content.replace(
+    /(\[workspace\.package\]\s*\n(?:[^\[]*\n)*?version\s*=\s*)"[^"]+"/,
+    `$1"${version}"`
+  );
+  fs.writeFileSync(fullPath, content, 'utf-8');
+  console.log(`  Updated Cargo.toml workspace version to ${version}`);
 }
 
 function bumpVersion(current: string, type: 'patch' | 'minor' | 'major'): string {
@@ -174,7 +190,7 @@ async function main(): Promise<void> {
   }
 
   // Determine new version
-  const currentPkg = getPackageJson(PACKAGES[0]);
+  const currentPkg = getPackageJson(NPM_PACKAGES[0]);
   const currentVersion = currentPkg.version || '0.0.0';
   let newVersion: string;
 
@@ -189,9 +205,13 @@ async function main(): Promise<void> {
 
   console.log(`\nReleasing v${newVersion} (from ${currentVersion})\n`);
 
+  // Update Cargo.toml workspace version
+  console.log('Updating Cargo.toml version...');
+  setCargoVersion(newVersion);
+
   // Update all package.json versions
   console.log('Updating package versions...');
-  for (const pkg of PACKAGES) {
+  for (const pkg of NPM_PACKAGES) {
     setPackageVersion(pkg, newVersion);
   }
 

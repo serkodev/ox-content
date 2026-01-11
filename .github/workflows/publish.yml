@@ -61,7 +61,7 @@ jobs:
 
       - name: Build NAPI
         working-directory: crates/ox_content_napi
-        run: pnpm build --target ${{ matrix.target }} ${{ matrix.target == 'aarch64-unknown-linux-gnu' && '--use-zig' || '' }}
+        run: pnpm build --target ${{ matrix.target }} ${{ matrix.target == 'aarch64-unknown-linux-gnu' && '--zig' || '' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -105,11 +105,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Publish
+      - name: Publish @ox-content/napi
         working-directory: crates/ox_content_napi
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
   publish-packages:
     name: Publish npm packages
@@ -145,35 +143,25 @@ jobs:
       - name: Build packages
         run: pnpm -r --filter './npm/*' run build
 
-      - name: Publish vite-plugin-ox-content
+      - name: Publish @ox-content/vite-plugin
         working-directory: npm/vite-plugin-ox-content
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
-      - name: Publish vite-plugin-ox-content-vue
+      - name: Publish @ox-content/vite-plugin-vue
         working-directory: npm/vite-plugin-ox-content-vue
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
-      - name: Publish vite-plugin-ox-content-react
+      - name: Publish @ox-content/vite-plugin-react
         working-directory: npm/vite-plugin-ox-content-react
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
-      - name: Publish vite-plugin-ox-content-svelte
+      - name: Publish @ox-content/vite-plugin-svelte
         working-directory: npm/vite-plugin-ox-content-svelte
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
-      - name: Publish unplugin-ox-content
+      - name: Publish @ox-content/unplugin
         working-directory: npm/unplugin-ox-content
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
   create-release:
     name: Create GitHub Release

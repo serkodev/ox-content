@@ -5,8 +5,9 @@
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "erasableSyntaxOnly": true
   },
-  "include": [],
+  "include": ["scripts"],
   "exclude": ["node_modules", "**/dist/**"]
 }

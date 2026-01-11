@@ -8,7 +8,8 @@
     "dev": "pnpm -r run dev",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
-    "typecheck": "oxlint --type-check"
+    "typecheck": "oxlint --type-check",
+    "release": "node --experimental-strip-types scripts/release.ts"
   },
   "devDependencies": {
     "oxlint": "catalog:",
